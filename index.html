@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PARALLAX — The Illusion Room</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+:root{--ink:#eef7ff;--muted:#b7c8da;--cyan:#79e4ff;--panel:rgba(7,18,35,.54)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071222;color:var(--ink);font-family:Outfit,Arial,sans-serif}canvas{display:block}
+
+body.in-game, body.in-game canvas { cursor: none !important; }
+
+#screen-fade { position: fixed; inset: 0; background: #030811; z-index: 9900; opacity: 1; pointer-events: none; transition: opacity 0.8s ease-in-out; }
+#screen-fade.hidden { opacity: 0; }
+#init-screen { position: fixed; inset: 0; background: #030811; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; cursor: pointer; transition: opacity 0.5s ease; }
+#init-screen.hidden { opacity: 0; pointer-events: none; }
+.init-text { font-size: 16px; letter-spacing: 0.2em; animation: pulse 2s infinite; color: #79e4ff; }
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+#splash-screen { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; pointer-events: none; background: radial-gradient(circle at 50% 50%, #0a1b35 0%, #030811 60%); transition: opacity 1.5s ease-in-out; }
+#splash-screen.hidden { opacity: 0; }
+
+.splash-group { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; width: 100%; text-align: center; }
+.studio-logo { font-size: 52px; font-weight: 800; letter-spacing: 0.4em; text-shadow: 0 0 35px rgba(121, 228, 255, 0.9), 0 0 70px rgba(255, 255, 255, 0.6); }
+.presents { font-size: 20px; color: #79e4ff; letter-spacing: 0.5em; margin-top: 15px; }
+.splash-affil { font-size: 22px; font-weight: 700; letter-spacing: 0.25em; color: #79e4ff; margin-bottom: 12px; text-transform: uppercase; }
+.splash-members { font-size: 16px; letter-spacing: 0.3em; color: #b7c8da; }
+.openai-title { font-size: 38px; font-weight: 800; letter-spacing: 0.12em; color: #a3ff12; text-shadow: 0 0 25px rgba(163, 255, 18, 0.6); margin-bottom: 10px; }
+.openai-sub { font-size: 18px; font-weight: 600; letter-spacing: 0.15em; color: #ffffff; margin-bottom: 6px; }
+.openai-desc { font-size: 14px; letter-spacing: 0.1em; color: #b7c8da; margin-bottom: 14px; }
+
+.anim-title { animation: fadeTitle 4s ease-in-out forwards; }
+.anim-info { animation: fadeInfo 4s ease-in-out 3.8s forwards; }
+.anim-openai { animation: fadeOpenAI 4s ease-in-out 7.6s forwards; }
+
+@keyframes fadeTitle { 0% { opacity: 0; transform: scale(1.05); filter: blur(12px); } 20%, 70% { opacity: 1; transform: scale(1); filter: blur(0px); } 90%, 100% { opacity: 0; transform: scale(0.95); filter: blur(6px); } }
+@keyframes fadeInfo { 0% { opacity: 0; transform: translateY(10px); filter: blur(10px); } 20%, 70% { opacity: 1; transform: translateY(0); filter: blur(0px); } 90%, 100% { opacity: 0; transform: translateY(-10px); filter: blur(5px); } }
+@keyframes fadeOpenAI { 0% { opacity: 0; transform: translateY(10px); filter: blur(10px); } 20%, 75% { opacity: 1; transform: translateY(0); filter: blur(0px); } 90%, 100% { opacity: 0; transform: translateY(-10px); filter: blur(5px); } }
+
+#loading-screen { position: absolute; inset: 0; background-color: #030811; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 90; color: #79e4ff; pointer-events: auto; }
+.spinner { width: 50px; height: 50px; border: 4px solid rgba(121, 228, 255, 0.15); border-top-color: #79e4ff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
+#loading-screen h2 { letter-spacing: 0.3em; font-size: 18px; margin: 0; font-weight: 600; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#game,#hud{position:fixed;inset:0}#hud{pointer-events:none}.panel{background:var(--panel);border:1px solid #d8f3ff2e;border-radius:12px;backdrop-filter:blur(10px);box-shadow:0 10px 32px #06101e48}
+#brand{position:absolute;left:24px;top:22px;padding:12px 15px}.brand{font-weight:800;font-size:15px;letter-spacing:.24em}.brand:before{content:"◇";color:var(--cyan);margin-right:8px;font-size:20px}.sub{display:block;margin:3px 0 0 28px;color:#c2d6e8;font-size:10px;letter-spacing:.1em}
+#level-popup { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); width: 340px; padding: 25px; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.6s ease-in-out; z-index: 10; }
+#level-popup.show { opacity: 1; top: 35%; }
+.eyebrow{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.12em;color:#b4cadb;margin-bottom: 12px;}.eyebrow span:last-child{color:#9eeeff; font-weight: 600;}
+.objective-title{font-size:24px;font-weight:700;margin:8px 0 10px; color: #fff;}
+.objective-text{font-size:14px;line-height:1.6;color:#d2e0eb; word-break: keep-all;}
+#objective-corner { position: absolute; top: 22px; right: 24px; width: 280px; padding: 15px 18px; text-align: right; opacity: 0; pointer-events: none; transition: opacity 0.6s ease-in-out; z-index: 10; }
+#objective-corner.show { opacity: 1; }
+#objective-corner .eyebrow { justify-content: flex-end; margin-bottom: 6px; }
+#objective-corner .objective-title { font-size: 16px; margin: 0 0 6px 0; }
+#objective-corner .objective-text { font-size: 12px; line-height: 1.5; color: #b4cadb; }
+#progress-ui { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 300px; text-align: center; }
+.track{height:6px;background:#ffffff22;border-radius:9px;overflow:hidden;margin-top:5px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);}.fill{height:100%;width:0;background:linear-gradient(90deg,#76dfff,#d6fbff);box-shadow:0 0 15px #82eaff;transition:width .12s}
+.score{font-size:11px;color:#b7d4e7;margin-top:8px; font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);}
+#controls{position:absolute;left:24px;bottom:22px;padding:10px 13px;color:#d5e4ef;font-size:11px}kbd{font:600 10px Outfit;border:1px solid #ffffff45;border-bottom-width:2px;border-radius:4px;padding:2px 5px;background:#ffffff14}.hint{position:absolute;left:50%;bottom:85px;transform:translateX(-50%);padding:9px 14px;font-size:12px;opacity:0;transition:.25s;z-index:120;}.hint.show{opacity:1}.cross{position:absolute;left:50%;top:50%;width:16px;height:16px;transform:translate(-50%,-50%)}.cross:before,.cross:after{content:"";position:absolute;background:#fff;box-shadow:0 0 8px #a5edff}.cross:before{left:7px;width:2px;height:16px}.cross:after{top:7px;width:16px;height:2px}
+
+#answer-box {
+    position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; padding: 10px 16px; pointer-events: auto; z-index: 100;
+    align-items: center; border: 1px solid rgba(121, 228, 255, 0.4); transition: border-color 0.3s;
+}
+#answer-input1, #answer-input2 {
+    padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(3,8,17,0.85); color: #fff; font-size: 13px; outline: none; width: 140px; transition: 0.2s;
+}
+#answer-input1:focus, #answer-input2:focus { border-color: #79e4ff; box-shadow: 0 0 10px rgba(121,228,255,0.5); }
+#btn-submit-answer {
+    padding: 8px 14px; border: none; border-radius: 6px; background: #79e4ff;
+    color: #030811; font-weight: 700; cursor: pointer; font-size: 13px; transition: 0.2s;
+}
+#btn-submit-answer:hover { background: #d6fbff; }
+
+.menu-box { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(12px); width: min(450px, calc(100% - 40px)); position: relative; z-index: 2; color: #2c3e50; transition: opacity 0.3s ease; }
+.menu-box h1, .menu-box h2 { font-size: 36px; letter-spacing: .15em; margin: 0 0 10px; font-weight: 800; color: #1e272e; }
+.btn-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.btn-menu { padding: 16px; border: none; border-radius: 8px; background: #2c3e50; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .1em; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(44, 62, 80, 0.2); }
+.btn-menu:hover { background: #34ace0; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(52, 172, 224, 0.4); }
+.btn-tutorial { background: #16a085; }
+.btn-tutorial:hover { background: #1abc9c; }
+
+#intro-screen { position: absolute; inset: 0; background: rgba(7, 18, 34, 0.4); display: grid; place-items: center; pointer-events: auto; z-index: 50; overflow: hidden; }
+.popup-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); display: grid; place-items: center; z-index: 60; backdrop-filter: blur(5px); }
+.warning-box { background: #fff; padding: 30px; border-radius: 12px; text-align: center; width: min(400px, calc(100% - 40px)); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+.warning-box h2 { color: #e74c3c; margin: 0 0 15px 0; font-size: 22px; }
+.warning-box p { color: #2c3e50; margin: 0 0 25px 0; font-size: 15px; line-height: 1.5; word-break: keep-all; }
+.warning-btns { display: flex; gap: 10px; }
+.warning-btns button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.btn-warn-yes { background: #95a5a6; color: #fff; }
+.btn-warn-no { background: #16a085; color: #fff; }
+
+#pause-screen { position: fixed; inset: 0; background: rgba(3, 8, 17, 0.75); display: flex; justify-content: center; align-items: center; z-index: 80; backdrop-filter: blur(8px); pointer-events: auto; }
+.setting-item { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 20px; text-align: left; }
+.setting-item.row { flex-direction: row; align-items: center; justify-content: space-between; }
+.setting-item label { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
+.setting-item input[type="range"] { width: 100%; cursor: pointer; accent-color: #34ace0; }
+
+#credits-screen { position: absolute; inset: 0; background-color: #000; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; pointer-events: auto; overflow: hidden; }
+.credits-scroll { position: absolute; top: 100%; width: 100%; text-align: center; animation: scrollCredits 20s linear infinite; }
+.credits-scroll h2 { font-size: 16px; color: #79e4ff; letter-spacing: 0.2em; margin-top: 40px; margin-bottom: 5px; font-weight: 600; }
+.credits-scroll p { font-size: 22px; margin: 0; font-weight: 400; }
+@keyframes scrollCredits { 0% { transform: translateY(0); } 100% { transform: translateY(calc(-100vh - 100%)); } }
+.btn-close-credits { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); padding: 12px 30px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; border-radius: 8px; font-size: 14px; cursor: pointer; }
+.hidden { display: none !important; opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div id="init-screen"><div class="init-text">클릭하여 시작하세요</div></div>
+
+<div id="splash-screen">
+    <div id="splash-group-title" class="splash-group">
+        <div id="splash-logo" class="studio-logo">PARALLAX</div>
+        <div id="splash-text" class="presents">The Illusion Room</div>
+    </div>
+    <div id="splash-group-info" class="splash-group">
+        <div id="splash-affil" class="splash-affil">상일미디어고등학교, 여울컴</div>
+        <div id="splash-members" class="splash-members">이상건 · 김도윤 · 양우성</div>
+    </div>
+    <div id="splash-group-openai" class="splash-group">
+        <div class="openai-title">OpenAI Game Builders Seoul</div>
+        <div class="openai-sub">Build with Codex, Play with Hive</div>
+        <div class="openai-desc">Codex로 만들고, Hive와 글로벌 무대로</div>
+    </div>
+</div>
+<div id="screen-fade"></div>
+
+<div id="loading-screen" class="hidden">
+    <div class="spinner"></div><h2>공간 생성 중...</h2>
+</div>
+
+<div id="intro-screen" class="hidden">
+    <div id="main-menu" class="menu-box">
+        <h1>PARALLAX</h1>
+        <div class="btn-stack">
+            <button id="btn-play" class="btn-menu">게임 시작</button>
+            <button id="btn-tutorial" class="btn-menu btn-tutorial">튜토리얼</button>
+            <button id="btn-settings-open" class="btn-menu">설정</button>
+            <button id="btn-credits-open" class="btn-menu">크레딧</button>
+        </div>
+    </div>
+    <div id="settings-menu" class="menu-box hidden">
+        <h2>설정</h2>
+        <div class="setting-item">
+            <label>배경음악 (BGM)</label><input type="range" id="bgm-volume" min="0" max="100" value="50">
+        </div>
+        <div class="setting-item">
+            <label>효과음 (SFX)</label><input type="range" id="sfx-volume" min="0" max="100" value="80">
+        </div>
+        <div class="setting-item row">
+            <label>자동 힌트 켜기</label><input type="checkbox" id="auto-hint" checked>
+        </div>
+        <button id="btn-settings-close" class="btn-menu" style="margin-top:20px;">닫기</button>
+    </div>
+    
+    <div id="tutorial-warning" class="popup-overlay hidden">
+        <div class="warning-box">
+            <h2>튜토리얼을 건너뛰시겠습니까?</h2>
+            <p>조작법과 규칙을 익히기 위해 튜토리얼을 먼저 진행하는 것을 권장합니다.</p>
+            <div class="warning-btns">
+                <button id="btn-warn-yes" class="btn-warn-yes">건너뛰기</button>
+                <button id="btn-warn-no" class="btn-warn-no">튜토리얼 하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tutorial-clear-popup" class="popup-overlay hidden">
+        <div class="warning-box">
+            <h2 style="color:#2ecc71;">튜토리얼 완료!</h2>
+            <p>이제 메인 게임을 시작할 준비가 되었습니다.</p>
+            <div class="warning-btns"><button id="btn-tut-clear-ok" class="btn-warn-no" style="width:100%">확인</button></div>
+        </div>
+    </div>
+
+    <div id="judge-popup" class="popup-overlay">
+        <div class="warning-box">
+            <h2 style="color:#34ace0;">심사위원 안내사항</h2>
+            <p> 본 게임은 마우스(시점)와 WASD(이동)를 이용한 착시 퍼즐 게임입니다.<br>
+            10~22 스테이지는 <b>다중 시점 착시 퍼즐</b>입니다. 정면과 측면 관찰 지점으로 이동하여 두 물체를 정밀 관찰한 뒤, 키보드 <b>1, 2</b>를 눌러 정답을 입력하세요!</p>
+            <div class="warning-btns"><button id="btn-judge-ok" class="btn-warn-no" style="width:100%">확인</button></div>
+        </div>
+    </div>
+</div>
+
+<div id="pause-screen" class="hidden">
+    <div class="menu-box">
+        <h2>일시정지</h2>
+        <div class="btn-stack">
+            <button id="btn-resume" class="btn-menu">돌아가기</button>
+            <button id="btn-pause-settings" class="btn-menu">설정</button>
+            <button id="btn-quit-title" class="btn-menu" style="background:#c0392b;">타이틀로</button>
+        </div>
+    </div>
+</div>
+
+<div id="credits-screen" class="hidden">
+    <div class="credits-scroll">
+        <h2>THE ILLUSION ROOM</h2><p>PARALLAX</p><br><br>
+        <h2>SCHOOL</h2><p>상일미디어고등학교</p><br><br>
+        <h2>TEAM</h2><p>여울컴</p><br><br>
+        <h2>MAIN DEVELOPER</h2><p>이상건</p><br><br>
+        <h2>DESIGN</h2><p>김도윤</p><br><br>
+        <h2>MUSIC</h2><p>양우성</p><br><br>
+    </div>
+    <button id="btn-close-credits" class="btn-close-credits">메인으로 돌아가기</button>
+</div>
+
+<div id="game"></div>
+
+<div id="hud" class="hidden">
+    <div id="progress-ui">
+        <div class="track"><div class="fill" id="fill"></div></div>
+        <div class="score" id="score">정렬도 00%</div>
+    </div>
+    <div id="objective-corner" class="panel">
+        <div class="eyebrow"><span id="corner-level">MAP 1 / 22</span></div>
+        <div class="objective-title" id="corner-title">스테이지 이름</div>
+        <div class="objective-text" id="corner-text">설명 텍스트</div>
+        <div id="corner-answer" style="margin-top: 8px; color: #79e4ff; font-weight: 700; font-size: 13px; display: none;"></div>
+    </div>
+    <div id="level-popup" class="panel">
+        <div class="eyebrow"><span id="level">MAP 1 / 22</span></div>
+        <div class="objective-title" id="title">스테이지 이름</div>
+        <div class="objective-text" id="text">설명 텍스트</div>
+    </div>
+
+    <div id="controls" class="panel">
+        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 &nbsp;&nbsp; 
+        <kbd>마우스</kbd> 시점 &nbsp;&nbsp; 
+        <kbd>1</kbd>/<kbd>2</kbd> 정답 입력 &nbsp;&nbsp; 
+        <kbd>Z</kbd> 힌트 &nbsp;&nbsp; 
+        <kbd>Q</kbd> 스킵 &nbsp;&nbsp; 
+        <kbd>ESC</kbd> 메뉴
+    </div>
+
+    <div id="answer-box" class="panel hidden">
+        <input type="text" id="answer-input1" placeholder="1. 정면 (숫자 1 키)">
+        <input type="text" id="answer-input2" placeholder="2. 측면 (숫자 2 키)">
+        <button id="btn-submit-answer">제출</button>
+    </div>
+
+    <div class="cross"></div>
+    <div id="hint" class="hint panel">힌트 메시지</div>
+</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.module.js';
+
+const $ = s => document.querySelector(s);
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+const audioOpening = new Audio('./PS5.mp3'); audioOpening.loop = false; audioOpening.volume = 0.5;
+const bgmGame = new Audio('./12.mp3'); bgmGame.loop = true; bgmGame.volume = 0.5;
+const sfxClearMaster = new Audio('./zd.mp3'); sfxClearMaster.preload = 'auto';
+
+function playSfxClear() {
+    try {
+        const sfxVolInput = $('#sfx-volume');
+        const vol = sfxVolInput ? sfxVolInput.value / 100 : 0.8;
+        const sound = sfxClearMaster.cloneNode();
+        sound.volume = vol; sound.play().catch(e => console.warn(e));
+    } catch(e) {}
+}
+
+let autoHintEnabled = true;
+$('#auto-hint').addEventListener('change', (e) => { autoHintEnabled = e.target.checked; });
+$('#bgm-volume').addEventListener('input', (e) => bgmGame.volume = e.target.value / 100);
+
+$('#init-screen').addEventListener('click', () => {
+    $('#init-screen').classList.add('hidden');
+    $('#splash-group-title').classList.add('anim-title');
+    $('#splash-group-info').classList.add('anim-info');
+    $('#splash-group-openai').classList.add('anim-openai');
+
+    audioOpening.currentTime = 0; audioOpening.play().catch(e => console.warn(e));
+    sfxClearMaster.volume = 0; sfxClearMaster.play().then(() => { sfxClearMaster.pause(); sfxClearMaster.currentTime = 0; }).catch(() => {});
+
+    setTimeout(() => {
+        audioOpening.pause(); audioOpening.currentTime = 0;
+        bgmGame.currentTime = 0; bgmGame.play().catch(e => console.warn(e));
+        $('#splash-screen').classList.add('hidden');
+        $('#intro-screen').classList.remove('hidden'); 
+        $('#screen-fade').classList.add('hidden'); 
+        setTimeout(() => { $('#splash-screen').style.display = 'none'; }, 1500); 
+    }, 12000); 
+});
+
+let popupTimer, isTutorialMode = false, hasClearedTutorial = false, inMenu = true, isPaused = false, settingsFromPause = false, menuYaw = 0, pendingLockOnClick = null;
+
+function requestGameLock() { 
+    renderer.domElement.requestPointerLock(); 
+}
+function clearPendingLockOnClick() { if (pendingLockOnClick) { renderer.domElement.removeEventListener('click', pendingLockOnClick); pendingLockOnClick = null; } }
+
+function openPauseMenu() {
+    if (isPaused) return;
+    isPaused = true; document.body.classList.remove('in-game'); $('#pause-screen').classList.remove('hidden'); clearPendingLockOnClick();
+}
+
+function resumeGame(viaKeyboard) {
+    if (!isPaused) return;
+    isPaused = false; $('#pause-screen').classList.add('hidden'); $('#settings-menu').classList.add('hidden'); $('#intro-screen').classList.add('hidden');
+    document.body.classList.add('in-game'); clearPendingLockOnClick();
+    if (viaKeyboard) {
+        showHint("🖱 화면을 한 번 클릭하면 시점 조작이 다시 활성화됩니다.");
+        pendingLockOnClick = () => { clearPendingLockOnClick(); requestGameLock(); };
+        renderer.domElement.addEventListener('click', pendingLockOnClick);
+    } else { requestGameLock(); }
+}
+
+function quitToTitle() {
+    isPaused = false; started = false; inMenu = true; menuYaw = 0; clearPendingLockOnClick(); isAnimatingClear = false;
+    document.body.classList.remove('in-game');
+    if (document.exitPointerLock) document.exitPointerLock();
+    $('#pause-screen').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#intro-screen').classList.remove('hidden');
+    $('#main-menu').classList.remove('hidden'); $('#settings-menu').classList.add('hidden');
+    clear(); maps[Math.floor(Math.random() * maps.length)].make();
+}
+
+function startGame(isTutorial) {
+    isTutorialMode = isTutorial; $('#screen-fade').classList.remove('hidden');
+    setTimeout(() => {
+        $('#intro-screen').classList.add('hidden'); $('#loading-screen').classList.remove('hidden'); $('#screen-fade').classList.add('hidden');
+        setTimeout(() => {
+            $('#screen-fade').classList.remove('hidden');
+            setTimeout(() => {
+                $('#loading-screen').classList.add('hidden'); $('#hud').classList.remove('hidden'); document.body.classList.add('in-game');
+                inMenu = false; isPaused = false; started = true; requestGameLock(); camera.rotation.order = 'YXZ'; 
+                load(0); $('#screen-fade').classList.add('hidden');
+            }, 800);
+        }, 1500); 
+    }, 800);
+}
+
+$('#btn-play').onclick = () => { if(hasClearedTutorial) startGame(false); else $('#tutorial-warning').classList.remove('hidden'); };
+$('#btn-warn-yes').onclick = () => { $('#tutorial-warning').classList.add('hidden'); startGame(false); };
+$('#btn-warn-no').onclick = () => { $('#tutorial-warning').classList.add('hidden'); startGame(true); };
+$('#btn-tut-clear-ok').onclick = () => { $('#tutorial-clear-popup').classList.add('hidden'); };
+$('#btn-judge-ok').onclick = () => { $('#judge-popup').classList.add('hidden'); };
+$('#btn-tutorial').onclick = () => startGame(true);
+$('#btn-settings-open').onclick = () => { settingsFromPause = false; $('#main-menu').classList.add('hidden'); $('#settings-menu').classList.remove('hidden'); };
+$('#btn-credits-open').onclick = () => { $('#intro-screen').classList.add('hidden'); $('#credits-screen').classList.remove('hidden'); }; 
+
+function closeSettings() {
+    $('#settings-menu').classList.add('hidden'); 
+    if (settingsFromPause) { $('#intro-screen').classList.add('hidden'); $('#pause-screen').classList.remove('hidden'); }
+    else { $('#intro-screen').classList.remove('hidden'); $('#main-menu').classList.remove('hidden'); }
+}
+
+$('#btn-settings-close').onclick = () => closeSettings();
+$('#btn-pause-settings').onclick = () => { settingsFromPause = true; $('#pause-screen').classList.add('hidden'); $('#intro-screen').classList.remove('hidden'); $('#main-menu').classList.add('hidden'); $('#settings-menu').classList.remove('hidden'); };
+$('#btn-resume').onclick = () => resumeGame();
+$('#btn-quit-title').onclick = () => quitToTitle();
+$('#btn-close-credits').onclick = () => { $('#credits-screen').classList.add('hidden'); $('#intro-screen').classList.remove('hidden'); };
+
+document.addEventListener('pointerlockchange', () => {
+    if (document.pointerLockElement !== renderer.domElement) {
+        document.body.classList.remove('in-game');
+        setTimeout(() => {
+            const isInputFocus = (document.activeElement === $('#answer-input1') || document.activeElement === $('#answer-input2'));
+            if (started && !inMenu && !isAnimatingClear && !isInputFocus && !isPaused) {
+                openPauseMenu();
+            }
+        }, 50);
+    } else {
+        document.body.classList.add('in-game');
+    }
+});
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xd2c696); scene.fog=new THREE.FogExp2(0xd2c696, 0.035); 
+const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.05,100);
+camera.position.set(0,1.7,8);camera.rotation.order='YXZ';
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.7)); renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0;
+$('#game').appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xfffae6, 0x4a4328, 1.2));
+scene.add(new THREE.AmbientLight(0xd2c696, 0.5));
+const world=new THREE.Group(),permanent=new THREE.Group();scene.add(permanent,world);
+
+const floorMat = new THREE.MeshStandardMaterial({color:0x8a7f5d, roughness:0.9, metalness:0});
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(30,30), floorMat); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; permanent.add(floor);
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30,30), new THREE.MeshStandardMaterial({color:0xd9d3b8, roughness:1.0})); ceiling.rotation.x = Math.PI/2; ceiling.position.y = 8; permanent.add(ceiling);
+const wallMat = new THREE.MeshStandardMaterial({color:0xc4b785, roughness:0.8, metalness:0.1});
+function makeWall(x, z, w, d) { let wall = new THREE.Mesh(new THREE.BoxGeometry(w, 8, d), wallMat); wall.position.set(x, 4, z); wall.castShadow = true; wall.receiveShadow = true; permanent.add(wall); }
+makeWall(0, -15.5, 32, 1); makeWall(0, 15.5, 32, 1); makeWall(-15.5, 0, 1, 30); makeWall(15.5, 0, 1, 30);  
+
+const gridHelper = new THREE.GridHelper(30, 30, 0xffffff, 0xffffff);
+gridHelper.position.y = 0.01; gridHelper.material.opacity = 0.12; gridHelper.material.transparent = true; permanent.add(gridHelper);
+for(let x=-10; x<=10; x+=10){ for(let z=-10; z<=10; z+=10){
+    let lightMesh = new THREE.Mesh(new THREE.BoxGeometry(2,0.1,0.5), new THREE.MeshBasicMaterial({color:0xfffae6})); lightMesh.position.set(x, 7.9, z); permanent.add(lightMesh);
+    let pLight = new THREE.PointLight(0xfffae6, 0.8, 15); pLight.position.set(x, 7.5, z); permanent.add(pLight);
+}}
+
+const mat=(color)=>new THREE.MeshBasicMaterial({color});
+function box(p,s,m,parent=world){let q=new THREE.Mesh(new THREE.BoxGeometry(...s),m);q.position.set(...p);parent.add(q);return q}
+function fragment(cam,original,size,depth,m){let r=new THREE.Vector3().subVectors(original,cam),old=r.length(),p=cam.clone().add(r.normalize().multiplyScalar(depth)),scale=depth/old;return box(p.toArray(),size.map(x=>x*scale),m)}
+function targetRing(p,color){let ring=new THREE.Mesh(new THREE.RingGeometry(.45,.68,40),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.85,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.set(p[0],.025,p[2]);world.add(ring);return ring}
+const v=a=>new THREE.Vector3(...a);
+
+function createAsciiShape(cam, center, asciiLines, cellSize, color, isFront) {
+    let c = mat(color);
+    let numRows = asciiLines.length;
+    let numCols = asciiLines[0].length;
+    let startY = (numRows / 2) * cellSize;
+    let startX = -(numCols / 2) * cellSize;
+
+    asciiLines.forEach((line, r) => {
+        for (let col = 0; col < line.length; col++) {
+            let char = line[col];
+            if (char !== ' ') {
+                let offX = startX + col * cellSize;
+                let offY = startY - r * cellSize;
+                
+                let orig = isFront ? 
+                    new THREE.Vector3(center.x + offX, center.y + offY, center.z) :
+                    new THREE.Vector3(center.x, center.y + offY, center.z + offX);
+
+                let depthSeed = ((r * 7 + col * 13) % 9);
+                let depth = 3.0 + depthSeed * 0.45;
+                let sz = [cellSize * 0.9, cellSize * 0.9, cellSize * 0.9];
+                fragment(cam, orig, sz, depth, c);
+            }
+        }
+    });
+}
+
+function makeMultiViewMesh(frontAscii, sideAscii, frontColor, sideColor) {
+    const frontCam = new THREE.Vector3(0, 1.7, 5);
+    const sideCam = new THREE.Vector3(5, 1.7, -3);
+    const center = new THREE.Vector3(0, 2.5, -3);
+
+    createAsciiShape(frontCam, center, frontAscii, 0.35, frontColor, true);
+    createAsciiShape(sideCam, center, sideAscii, 0.35, sideColor, false);
+}
+
+const tutorialMaps = [
+    { name: "조작과 시선", desc: "W,A,S,D 로 이동하고 마우스를 움직여 방향을 바꾸세요.", hint: "마우스를 천천히 돌려 전방의 정방형 프레임을 정면에서 바라보세요.", pos: [0, 1.7, 5], look: [0, 1.7, -5], color: 0x55ff77, make() { let c = mat(this.color); let cam = v(this.pos); [[-1,3,2,2], [1,3,2,2], [-1,1,2,2], [1,1,2,2]].forEach((p, idx) => fragment(cam, new THREE.Vector3(p[0], p[1], -5), [p[2], p[3], 1], 4 + (idx * 3) + (idx * 0.05), c)); } },
+    { name: "원근과 착시", desc: "상단의 '정렬도'가 100%가 되는 위치를 찾아보세요.", hint: "바닥에 생성된 표식 위치로 이동한 뒤 흩어진 모양을 하나로 맞추세요.", pos: [-3, 1.7, 3], look: [0, 1.7, -5], color: 0x55ffff, make() { let c = mat(this.color); let cam = v(this.pos); [[0,2.5,1,4], [-2,4.5,3,1], [2,4.5,3,1]].forEach((p, idx) => fragment(cam, new THREE.Vector3(p[0], p[1], -5), [p[2], p[3], 1], 5 + (idx * 6) + (idx * 0.05), c)); } }
+];
+
+const mapDefs = [
+    { n: "부서진 계단", isMulti: false, hint: "계단을 오르는 방향(정면)에서 바라보며 높이를 맞추세요.", make: () => [[-2,0.5,0.8,0.4],[-1,1.0,0.8,0.4],[0,1.5,0.8,0.4],[1,2.0,0.8,0.4],[2,2.5,0.8,0.4]] },
+    { n: "어긋난 문틀", isMulti: false, hint: "네 모서리가 직사각형으로 이어지도록 중앙 지점으로 이동하세요.", make: () => [[-1.5,2.2,0.4,3.6],[1.5,2.2,0.4,3.6],[0,4.0,3.4,0.4],[0,0.4,3.4,0.4]] },
+    { n: "거대한 십자가", isMulti: false, hint: "세로축과 가로축 교차점이 수평하게 만나는 위치에서 정면을 보세요.", make: () => [[0,2.5,0.8,4.2],[0,3.0,3.6,0.8]] },
+    { n: "공허한 사각형", isMulti: false, hint: "외곽 틀이 빈틈없이 닫히는 지점을 찾아 시선을 평행하게 만드세요.", make: () => [[0,4.2,3.8,0.6],[0,0.8,3.8,0.6],[-1.6,2.5,0.6,2.8],[1.6,2.5,0.6,2.8]] },
+    { n: "공중 액자", isMulti: false, hint: "앞뒤 깊이감이 사라지며 하나의 액자처럼 겹쳐지는 각도를 맞추세요.", make: () => [[0,4.5,5.0,0.4],[0,0.5,5.0,0.4],[-2.3,2.5,0.4,3.6],[2.3,2.5,0.4,3.6]] },
+    { n: "흩어진 기둥", isMulti: false, hint: "기둥들의 폭이 등간격으로 수평 배치되는 정면 각도를 찾아보세요.", make: () => [[-2.4,2.5,0.6,4.0],[-0.8,2.5,0.6,4.0],[0.8,2.5,0.6,4.0],[2.4,2.5,0.6,4.0]] },
+    { n: "조각난 다리", isMulti: false, hint: "상판 조각과 밑 받침이 일자로 곧게 연결되는 각도로 이동하세요.", make: () => [[-2.2,1.2,0.8,1.8],[2.2,1.2,0.8,1.8],[0,2.3,5.2,0.6]] },
+    { n: "격자 창문", isMulti: false, hint: "십자선과 외곽 창틀이 정중앙에서 교차하도록 각도를 조정하세요.", make: () => [[-1.6,2.5,0.4,3.2],[1.6,2.5,0.4,3.2],[0,4.1,3.6,0.4],[0,0.9,3.6,0.4],[0,2.5,0.3,2.8],[0,2.5,2.9,0.3]] },
+    { n: "피라미드", isMulti: false, hint: "층층이 나뉜 사각형들이 중심을 향해 피라미드로 모이게 하세요.", make: () => [[0,0.8,4.8,0.6],[0,1.8,3.6,0.6],[0,2.8,2.4,0.6],[0,3.8,1.2,0.6]] },
+
+    { n: "맹수의 환영", isMulti: true, ans: ["호랑이", "사자"], fColor:0xffa500, sColor:0xffd700,
+      fAscii: ["  #     #  "," ###   ### ","###########","## # # # ##","###########"," ### # ### ","  #######  ","   #####   "],
+      sAscii: ["  #######  "," ######### ","###  #  ###","### ### ###","###  #  ###"," ######### ","  #######  ","    ###    "] },
+
+    { n: "낮과 밤", isMulti: true, ans: ["해", "달"], fColor:0xff4500, sColor:0x00ffff,
+      fAscii: ["  #  #  #  ","   #####   "," # ####### ","###########"," # ####### ","   #####   ","  #  #  #  "],
+      sAscii: ["   ##### ","  ###### "," ####    "," ####    "," ####    ","  ###### ","   ##### "] },
+
+    { n: "자연의 형상", isMulti: true, ans: ["산", "바다"], fColor:0x2ecc71, sColor:0x3498db,
+      fAscii: ["     #     ","    ###    ","  # #####  "," ######### ","###########"],
+      sAscii: ["  ##      ##  "," ####    #### ","######  ######","##############"] },
+
+    { n: "전투의 상징", isMulti: true, ans: ["칼", "방패"], fColor:0xe74c3c, sColor:0x9b59b6,
+      fAscii: ["    #    ","    #    ","    #    ","    #    ","  #####  ","    #    ","    #    ","    #    "],
+      sAscii: [" ####### ","#########","#########"," ####### ","  #####  ","   ###   ","    #    "] },
+
+    { n: "공중과 수중", isMulti: true, ans: ["새", "물고기"], fColor:0x1abc9c, sColor:0xf39c12,
+      fAscii: ["#         #","##   #   ##","### ### ###"," ######### ","    ###    ","     #     "],
+      sAscii: ["    #      ","  #####  # ","######### #"," ######### ","  #####  # ","    #      "] },
+
+    { n: "원소의 대립", isMulti: true, ans: ["불", "물"], fColor:0xff3300, sColor:0x3399ff,
+      fAscii: ["   #   #   ","  ### ###  "," ######### ","###########"," ######### ","  #######  "],
+      sAscii: ["    #    ","   ###   ","  #####  "," ####### ","#########"," ####### ","  #####  "] },
+
+    { n: "왕실의 보물", isMulti: true, ans: ["왕관", "보석"], fColor:0xffd700, sColor:0x9933ff,
+      fAscii: ["#   #   #","## ### ##","#########","#########","#########"],
+      sAscii: ["  #####  "," ####### ","#########"," ####### ","  #####  ","   ###   ","    #    "] },
+
+    { n: "정원의 정취", isMulti: true, ans: ["나무", "꽃"], fColor:0x27ae60, sColor:0xff6699,
+      fAscii: ["  #####  "," ####### ","#########"," ####### ","   ###   ","   ###   ","   ###   "],
+      sAscii: ["  # # #  ","  #####  ","# ##### #","  #####  ","  # # #  ","    #    ","   ###   "] },
+
+    { n: "하늘의 기호", isMulti: true, ans: ["하트", "별"], fColor:0xff3366, sColor:0xffcc00,
+      fAscii: [" ###   ### ","##### #####","###########"," ######### ","  #######  ","   #####   ","    ###    ","     #     "],
+      sAscii: ["    #    ","   ###   ","#########"," ####### ","  #####  "," ##   ## ","#       #"] },
+
+    { n: "비밀의 문", isMulti: true, ans: ["열쇠", "자물쇠"], fColor:0xf1c40f, sColor:0x7f8c8d,
+      fAscii: ["  #####  "," ##   ## ","  #####  ","    #    ","    ###  ","    #    ","    ##   "],
+      sAscii: ["  #####  "," ##   ## "," ##   ## ","#########","#### ####","#########"] },
+
+    { n: "반려의 미학", isMulti: true, ans: ["고양이", "강아지"], fColor:0xe67e22, sColor:0x34495e,
+      fAscii: ["#       #","##     ##","#########","## # # ##","#########"," ####### ","  #####  "],
+      sAscii: ["####     ","######   ","#########","  #######","  #####  ","  #   #  "] },
+
+    { n: "선율의 향연", isMulti: true, ans: ["피아노", "기타"], fColor:0xecf0f1, sColor:0x3498db,
+      fAscii: ["#########","#########","# # # # #","# # # # #","#########"],
+      sAscii: ["    #    ","    #    ","   ###   ","  #####  "," ####### ","  #####  "," ####### ","  #####  "] },
+
+    { n: "빛과 어둠", isMulti: true, ans: ["빛", "그림자"], fColor:0xffea00, sColor:0x8e44ad,
+      fAscii: ["  # # #  ","  #####  ","# ##### #","  #####  ","   ###   ","   ###   "],
+      sAscii: ["   ###   ","   ###   "," ####### "," ####### ","   ###   ","  ## ##  ","  ## ##  "] }
+];
+
+const maps = mapDefs.map((def, idx) => {
+    let basePos = [0, 1.7, 5];
+    let baseLook = [0, 2.5, -3];
+    
+    return {
+        name: def.n,
+        desc: def.isMulti ? "정면과 측면에서 관찰하여 두 물체를 알아내세요." : "분리된 구조물이 완벽한 하나로 합성되는 각도를 찾으세요.",
+        hint: def.hint || "",
+        pos: basePos, look: baseLook, color: def.fColor || 0x79e4ff,
+        isMultiView: def.isMulti,
+        answers: def.ans || [],
+        frontAscii: def.fAscii, sideAscii: def.sAscii, frontColor: def.fColor, sideColor: def.sColor,
+        make() {
+            if (this.isMultiView) {
+                makeMultiViewMesh(this.frontAscii, this.sideAscii, this.frontColor, this.sideColor);
+            } else {
+                let c = mat(this.color); let cam = v(this.pos); let targetCenter = v(this.look); let boxes = def.make();
+                boxes.forEach((p, bIdx) => { 
+                    let orig = new THREE.Vector3(targetCenter.x + p[0], p[1], targetCenter.z); 
+                    let size = [p[2], p[3], 0.8]; 
+                    let depth = 3.0 + (bIdx * 1.5); 
+                    fragment(cam, orig, size, depth, c); 
+                });
+            }
+        }
+    };
+});
+
+let currentIdx = 0, targetCamPos = new THREE.Vector3(), targetLookAt = new THREE.Vector3();
+let hintRings = [];
+
+function clearRings() { hintRings.forEach(r => world.remove(r)); hintRings = []; }
+function clear(){ while(world.children.length) world.remove(world.children[0]); clearRings(); }
+
+function showLevelPopup(map) {
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    let levelText = `${isTutorialMode ? '튜토리얼' : 'MAP'} ${currentIdx + 1} / ${activeMaps.length}`;
+    $('#level').textContent = levelText; $('#title').textContent = map.name; $('#text').textContent = map.desc;
+    $('#level-popup').classList.remove('show'); $('#objective-corner').classList.remove('show');
+    
+    const cornerAns = $('#corner-answer');
+    if (cornerAns) {
+        cornerAns.style.display = 'none';
+        cornerAns.textContent = '';
+    }
+
+    if (popupTimer) clearTimeout(popupTimer);
+    setTimeout(() => $('#level-popup').classList.add('show'), 100);
+    popupTimer = setTimeout(() => {
+        $('#level-popup').classList.remove('show');
+        setTimeout(() => {
+            if (started) { 
+                $('#corner-level').textContent = levelText; 
+                $('#corner-title').textContent = $('#title').textContent; 
+                $('#corner-text').textContent = $('#text').textContent; 
+                $('#objective-corner').classList.add('show'); 
+            }
+        }, 600);
+    }, 5000);
+}
+
+function checkAnswer() {
+    const input1 = $('#answer-input1');
+    const input2 = $('#answer-input2');
+    const val1 = input1.value.trim().toLowerCase().replace(/\s+/g, '');
+    const val2 = input2.value.trim().toLowerCase().replace(/\s+/g, '');
+    const currentStage = maps[currentIdx];
+
+    if (!currentStage || !currentStage.isMultiView || !currentStage.answers) return;
+
+    const ans1 = currentStage.answers[0].toLowerCase().replace(/\s+/g, '');
+    const ans2 = currentStage.answers[1].toLowerCase().replace(/\s+/g, '');
+
+    const isDirect = (val1.includes(ans1) && val2.includes(ans2));
+    const isReverse = (val1.includes(ans2) && val2.includes(ans1));
+
+    input1.blur(); 
+    input2.blur();
+
+    if ((val1 && val2) && (isDirect || isReverse)) {
+        showHint("🎉 정답입니다!");
+        requestGameLock();
+        onPuzzleCleared();
+    } else {
+        showHint("❌ 정답이 아닙니다. 다시 시도해보세요!");
+        input1.style.borderColor = '#ef476f'; input2.style.borderColor = '#ef476f';
+        setTimeout(() => { 
+            input1.style.borderColor = 'rgba(255,255,255,0.2)'; 
+            input2.style.borderColor = 'rgba(255,255,255,0.2)'; 
+        }, 1500);
+        requestGameLock();
+    }
+}
+
+$('#btn-submit-answer').onclick = checkAnswer;
+[$('#answer-input1'), $('#answer-input2')].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter') checkAnswer();
+        if (e.key === 'Escape') {
+            input.blur();
+            requestGameLock();
+        }
+    });
+    input.addEventListener('focus', () => {
+        if (document.pointerLockElement) document.exitPointerLock();
+    });
+});
+
+renderer.domElement.addEventListener('click', () => {
+    if (started && !isPaused && !inMenu && !isAnimatingClear) {
+        const isInputFocused = (document.activeElement === $('#answer-input1') || document.activeElement === $('#answer-input2'));
+        if (isInputFocused) {
+            $('#answer-input1').blur();
+            $('#answer-input2').blur();
+        }
+        if (document.pointerLockElement !== renderer.domElement) {
+            requestGameLock();
+        }
+    }
+});
+
+function load(idx){
+    currentIdx = idx; clear(); let activeMaps = isTutorialMode ? tutorialMaps : maps; let m = activeMaps[idx]; m.make();
+    targetCamPos.set(...m.pos); targetLookAt.set(...m.look);
+    
+    camera.position.set(0, 1.7, 13.0);
+    let initDir = new THREE.Vector3().subVectors(new THREE.Vector3(0, 1.7, 0), camera.position).normalize();
+    yaw = Math.atan2(-initDir.x, -initDir.z); pitch = Math.asin(initDir.y); 
+    camera.rotation.set(pitch, yaw, 0, 'YXZ');
+    
+    if (!isTutorialMode && m.isMultiView) {
+        $('#answer-input1').value = '';
+        $('#answer-input2').value = '';
+        $('#answer-box').classList.remove('hidden');
+    } else {
+        $('#answer-box').classList.add('hidden');
+    }
+
+    showLevelPopup(m);
+}
+
+function getAlignmentScore() {
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    let progress = activeMaps.length > 1 ? currentIdx / (activeMaps.length - 1) : 0; 
+    
+    let posTolerance = 3.5 - (progress * 2.0);
+    let angleTolerance = 0.45 - (progress * 0.27);
+
+    let posDist = camera.position.distanceTo(targetCamPos);
+    let currentDir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).normalize();
+    let targetDir = new THREE.Vector3().subVectors(targetLookAt, targetCamPos).normalize();
+    let angleDiff = currentDir.angleTo(targetDir);
+    
+    let posScore = Math.max(0, 1 - (posDist / posTolerance)); 
+    let angleScore = Math.max(0, 1 - (angleDiff / angleTolerance));
+    return Math.pow((posScore * 0.5) + (angleScore * 0.5), 2); 
+}
+
+const keys={}; let yaw=0, pitch=0;
+addEventListener('keydown', e => {
+    const isInputFocused = (document.activeElement === $('#answer-input1') || document.activeElement === $('#answer-input2'));
+    
+    if (isInputFocused) {
+        if (e.code === 'Escape') {
+            $('#answer-input1').blur();
+            $('#answer-input2').blur();
+            requestGameLock();
+            return;
+        }
+    } else {
+        keys[e.code] = true;
+
+        let activeMaps = isTutorialMode ? tutorialMaps : maps;
+        let currentStageObj = activeMaps[currentIdx];
+
+        if (currentStageObj && currentStageObj.isMultiView) {
+            if ((e.code === 'Digit1' || e.code === 'Numpad1') && started && !isPaused) {
+                e.preventDefault();
+                if (document.pointerLockElement) document.exitPointerLock();
+                setTimeout(() => $('#answer-input1').focus(), 10);
+                return;
+            }
+            if ((e.code === 'Digit2' || e.code === 'Numpad2') && started && !isPaused) {
+                e.preventDefault();
+                if (document.pointerLockElement) document.exitPointerLock();
+                setTimeout(() => $('#answer-input2').focus(), 10);
+                return;
+            }
+        }
+
+        if (e.code === 'KeyQ' && started && !isPaused) {
+            onPuzzleCleared();
+            return;
+        }
+
+        if (e.code === 'KeyZ' && started && !isPaused) {
+            let m = activeMaps[currentIdx];
+            if (!isTutorialMode && m.isMultiView && m.answers) {
+                const cornerAns = $('#corner-answer');
+                if (cornerAns) {
+                    cornerAns.textContent = `정답: ${m.answers[0]}, ${m.answers[1]}`;
+                    cornerAns.style.display = 'block';
+                }
+                $('#objective-corner').classList.add('show');
+                showHint(`💡 오른쪽 상단에 정답이 표시되었습니다.`);
+            } else {
+                showHint(`💡 힌트: ${m.hint}`);
+            }
+
+            if (hintRings.length === 0) {
+                if (m.isMultiView) {
+                    hintRings.push(targetRing([0, 0.025, 5], 0x79e4ff));
+                    hintRings.push(targetRing([5, 0.025, -3], 0xffd166));
+                } else {
+                    hintRings.push(targetRing([targetCamPos.x, 0.025, targetCamPos.z], 0x79e4ff));
+                }
+            }
+            return;
+        }
+    }
+
+    if (e.code === 'Escape') {
+        if (!$('#credits-screen').classList.contains('hidden')) { $('#credits-screen').classList.add('hidden'); $('#intro-screen').classList.remove('hidden'); return; }
+        if (!$('#settings-menu').classList.contains('hidden')) { closeSettings(); return; }
+        if (started && !inMenu && !isAnimatingClear) {
+            if (document.pointerLockElement === renderer.domElement) return;
+            isPaused ? resumeGame(true) : openPauseMenu();
+        } return;
+    }
+});
+
+addEventListener('keyup', e => { 
+    if (document.activeElement !== $('#answer-input1') && document.activeElement !== $('#answer-input2')) {
+        keys[e.code] = false; 
+    }
+});
+
+addEventListener('mousemove', e => {
+    if (document.pointerLockElement !== renderer.domElement || isPaused || isAnimatingClear) return;
+    yaw -= e.movementX * 0.002; pitch -= e.movementY * 0.002; pitch = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, pitch));
+});
+
+function showHint(msg){ let h = $('#hint'); h.textContent = msg; h.classList.add('show'); setTimeout(() => h.classList.remove('show'), 4000); }
+
+let lastTime = performance.now(), started = false;
+let isAnimatingClear = false; let clearAnimTime = 0; let isTransitioning = false;
+let startCamPos = new THREE.Vector3(); let startCamQuat = new THREE.Quaternion(); let targetCamQuat = new THREE.Quaternion();
+let clearOrigColor = 0;
+
+function onPuzzleCleared() {
+    isAnimatingClear = true; clearAnimTime = 0; isTransitioning = false;
+    playSfxClear();
+
+    startCamPos.copy(camera.position); startCamQuat.copy(camera.quaternion);
+    let exactDir = new THREE.Vector3().subVectors(targetLookAt, targetCamPos).normalize();
+    let dummyCam = new THREE.PerspectiveCamera();
+    dummyCam.rotation.set(Math.asin(exactDir.y), Math.atan2(-exactDir.x, -exactDir.z), 0, 'YXZ');
+    targetCamQuat.copy(dummyCam.quaternion);
+    
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    clearOrigColor = activeMaps[currentIdx].color;
+
+    world.children.forEach(child => { 
+        if(child.isMesh && child.geometry.type === 'BoxGeometry') { 
+            child.userData.origMat = child.material.clone();
+        } 
+    });
+}
+
+function nextStageTransition() {
+    $('#screen-fade').classList.remove('hidden');
+    setTimeout(() => {
+        isAnimatingClear = false; 
+        let activeMaps = isTutorialMode ? tutorialMaps : maps;
+        if (currentIdx + 1 < activeMaps.length) {
+            load(currentIdx + 1);
+            setTimeout(() => { $('#screen-fade').classList.add('hidden'); }, 300);
+        } else {
+            if (isTutorialMode) {
+                hasClearedTutorial = true; quitToTitle();
+                setTimeout(() => { $('#tutorial-clear-popup').classList.remove('hidden'); $('#screen-fade').classList.add('hidden'); }, 500);
+            } else {
+                quitToTitle();
+                setTimeout(() => { $('#credits-screen').classList.remove('hidden'); $('#screen-fade').classList.add('hidden'); }, 500);
+            }
+        }
+    }, 800); 
+}
+
+maps[Math.floor(Math.random() * maps.length)].make();
+
+function animate(now) {
+    requestAnimationFrame(animate);
+    let dt = Math.min((now - lastTime) / 1000, 0.1); lastTime = now;
+    
+    if (inMenu && !started) {
+        menuYaw += dt * 0.15; 
+        camera.position.set(Math.sin(menuYaw) * 9, 2.5, Math.cos(menuYaw) * 9); 
+        camera.lookAt(0, 2, -2);
+        renderer.render(scene, camera); 
+        return;
+    }
+    
+    if (!started || isPaused) { renderer.render(scene, camera); return; }
+
+    if (isAnimatingClear) {
+        clearAnimTime += dt;
+        let t = Math.min(clearAnimTime / 3.0, 1.0);
+        let easeT = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        
+        camera.position.lerpVectors(startCamPos, targetCamPos, easeT);
+        camera.quaternion.slerpQuaternions(startCamQuat, targetCamQuat, easeT);
+        
+        let euler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+        pitch = euler.x; yaw = euler.y;
+
+        let isWhite = Math.floor(clearAnimTime / 0.25) % 2 === 0;
+        let currentColor = isWhite ? 0xffffff : clearOrigColor;
+
+        world.children.forEach(child => { 
+            if(child.isMesh && child.userData.origMat) { 
+                child.material = child.userData.origMat;
+                child.material.color.setHex(currentColor);
+            }
+        });
+
+        if (clearAnimTime >= 3.0 && !isTransitioning) {
+            isTransitioning = true;
+            nextStageTransition();
+        }
+    } else {
+        const isInputFocused = (document.activeElement === $('#answer-input1') || document.activeElement === $('#answer-input2'));
+        if (!isInputFocused) {
+            camera.rotation.set(pitch, yaw, 0, 'YXZ');
+            let moveSpeed = (keys.ShiftLeft || keys.ShiftRight ? 8.0 : 4.0) * dt;
+            let forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize(), side = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize(), move = new THREE.Vector3();
+            if (keys.KeyW) move.add(forward); if (keys.KeyS) move.sub(forward); if (keys.KeyD) move.add(side); if (keys.KeyA) move.sub(side); 
+            if (move.lengthSq() > 0) { move.normalize().multiplyScalar(moveSpeed); camera.position.add(move); camera.position.x = Math.max(-14, Math.min(14, camera.position.x)); camera.position.z = Math.max(-14, Math.min(14, camera.position.z)); }
+        }
+    }
+
+    let rawScore = getAlignmentScore(), displayScore = Math.floor(rawScore * 100);
+    $('#fill').style.width = `${displayScore}%`; $('#score').textContent = `정렬도 ${displayScore.toString().padStart(2, '0')}%`;
+    
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    if (!activeMaps[currentIdx].isMultiView && (rawScore >= 0.899 || displayScore >= 90) && !isAnimatingClear) { 
+        onPuzzleCleared(); 
+    } 
+
+    renderer.render(scene, camera);
+}
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
