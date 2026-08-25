@@ -43,7 +43,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
 #loading-screen h2 { letter-spacing: 0.3em; font-size: 18px; margin: 0; font-weight: 600; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-#game,#hud{position:fixed;inset:0}#hud{pointer-events:none}.panel{background:var(--panel);border:1px solid #d8f3ff2e;border-radius:12px;backdrop-filter:blur(10px);box-shadow:0 10px 32px #06101e48}
+#game,#hud{position:fixed;inset:0}#hud{pointer-events:none}.panel{background:rgba(7,18,35,.68);border:1px solid #d8f3ff2e;border-radius:12px;box-shadow:0 6px 18px #06101e38}
 #brand{position:absolute;left:24px;top:22px;padding:12px 15px}.brand{font-weight:800;font-size:15px;letter-spacing:.24em}.brand:before{content:"◇";color:var(--cyan);margin-right:8px;font-size:20px}.sub{display:block;margin:3px 0 0 28px;color:#c2d6e8;font-size:10px;letter-spacing:.1em}
 #level-popup { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); width: 340px; padding: 25px; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.6s ease-in-out; z-index: 10; }
 #level-popup.show { opacity: 1; top: 35%; }
@@ -55,6 +55,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
 #objective-corner .eyebrow { justify-content: flex-end; margin-bottom: 6px; }
 #objective-corner .objective-title { font-size: 16px; margin: 0 0 6px 0; }
 #objective-corner .objective-text { font-size: 12px; line-height: 1.5; color: #b4cadb; }
+#fps-counter { margin-top: 8px; color: #79e4ff; font-weight: 700; font-size: 12px; letter-spacing: 0.08em; }
 #progress-ui { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 300px; text-align: center; }
 .track{height:6px;background:#ffffff22;border-radius:9px;overflow:hidden;margin-top:5px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);}.fill{height:100%;width:0;background:linear-gradient(90deg,#76dfff,#d6fbff);box-shadow:0 0 15px #82eaff;transition:width .12s}
 .score{font-size:11px;color:#b7d4e7;margin-top:8px; font-weight: 600; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);}
@@ -76,7 +77,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
 }
 #btn-submit-answer:hover { background: #d6fbff; }
 
-.menu-box { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(12px); width: min(450px, calc(100% - 40px)); position: relative; z-index: 2; color: #2c3e50; transition: opacity 0.3s ease; }
+.menu-box { background: rgba(255, 255, 255, 0.82); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12); width: min(450px, calc(100% - 40px)); position: relative; z-index: 2; color: #2c3e50; transition: opacity 0.3s ease; }
 .menu-box h1, .menu-box h2 { font-size: 36px; letter-spacing: .15em; margin: 0 0 10px; font-weight: 800; color: #1e272e; }
 .btn-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
 .btn-menu { padding: 16px; border: none; border-radius: 8px; background: #2c3e50; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .1em; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(44, 62, 80, 0.2); }
@@ -85,7 +86,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
 .btn-tutorial:hover { background: #1abc9c; }
 
 #intro-screen { position: absolute; inset: 0; background: rgba(7, 18, 34, 0.4); display: grid; place-items: center; pointer-events: auto; z-index: 50; overflow: hidden; }
-.popup-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); display: grid; place-items: center; z-index: 60; backdrop-filter: blur(5px); }
+.popup-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.68); display: grid; place-items: center; z-index: 60; }
 .warning-box { background: #fff; padding: 30px; border-radius: 12px; text-align: center; width: min(400px, calc(100% - 40px)); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
 .warning-box h2 { color: #e74c3c; margin: 0 0 15px 0; font-size: 22px; }
 .warning-box p { color: #2c3e50; margin: 0 0 25px 0; font-size: 15px; line-height: 1.5; word-break: keep-all; }
@@ -94,7 +95,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
 .btn-warn-yes { background: #95a5a6; color: #fff; }
 .btn-warn-no { background: #16a085; color: #fff; }
 
-#pause-screen { position: fixed; inset: 0; background: rgba(3, 8, 17, 0.75); display: flex; justify-content: center; align-items: center; z-index: 80; backdrop-filter: blur(8px); pointer-events: auto; }
+#pause-screen { position: fixed; inset: 0; background: rgba(3, 8, 17, 0.82); display: flex; justify-content: center; align-items: center; z-index: 80; pointer-events: auto; }
 .setting-item { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 20px; text-align: left; }
 .setting-item.row { flex-direction: row; align-items: center; justify-content: space-between; }
 .setting-item label { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
@@ -184,6 +185,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
             <h2 style="color:#34ace0;">심사위원 안내사항</h2>
             <p> 본 게임은 마우스(시점)와 WASD(이동)를 이용한 착시 퍼즐 게임입니다.<br>
             10~22 스테이지는 <b>다중 시점 착시 퍼즐</b>입니다. 정면과 측면 관찰 지점으로 이동하여 두 물체를 정밀 관찰한 뒤, 키보드 <b>1, 2</b>를 눌러 정답을 입력하세요!</p>
+            <p>플레이 하시다가 막히신다면 Z나 Q를 누르시면 해결될 것입니다.</p>
             <div class="warning-btns"><button id="btn-judge-ok" class="btn-warn-no" style="width:100%">확인</button></div>
         </div>
     </div>
@@ -224,6 +226,7 @@ body.in-game, body.in-game canvas { cursor: none !important; }
         <div class="objective-title" id="corner-title">스테이지 이름</div>
         <div class="objective-text" id="corner-text">설명 텍스트</div>
         <div id="corner-answer" style="margin-top: 8px; color: #79e4ff; font-weight: 700; font-size: 13px; display: none;"></div>
+        <div id="fps-counter">FPS 00</div>
     </div>
     <div id="level-popup" class="panel">
         <div class="eyebrow"><span id="level">MAP 1 / 22</span></div>
@@ -235,8 +238,8 @@ body.in-game, body.in-game canvas { cursor: none !important; }
         <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 &nbsp;&nbsp; 
         <kbd>마우스</kbd> 시점 &nbsp;&nbsp; 
         <kbd>1</kbd>/<kbd>2</kbd> 정답 입력 &nbsp;&nbsp; 
-        <kbd>Z</kbd> 힌트 &nbsp;&nbsp; 
-        <kbd>Q</kbd> 스킵 &nbsp;&nbsp; 
+        <kbd>?</kbd> 힌트 &nbsp;&nbsp; 
+        <kbd>?</kbd> 스킵 &nbsp;&nbsp; 
         <kbd>ESC</kbd> 메뉴
     </div>
 
@@ -256,13 +259,26 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.m
 const $ = s => document.querySelector(s);
 document.addEventListener('contextmenu', e => e.preventDefault());
 
+const ui = {
+    autoHint: $('#auto-hint'),
+    bgmVolume: $('#bgm-volume'),
+    sfxVolume: $('#sfx-volume'),
+    fill: $('#fill'),
+    score: $('#score'),
+    fpsCounter: $('#fps-counter'),
+    answerInput1: $('#answer-input1'),
+    answerInput2: $('#answer-input2'),
+    cornerAnswer: $('#corner-answer'),
+    objectiveCorner: $('#objective-corner')
+};
+
 const audioOpening = new Audio('./PS5.mp3'); audioOpening.loop = false; audioOpening.volume = 0.5;
 const bgmGame = new Audio('./12.mp3'); bgmGame.loop = true; bgmGame.volume = 0.5;
 const sfxClearMaster = new Audio('./zd.mp3'); sfxClearMaster.preload = 'auto';
 
 function playSfxClear() {
     try {
-        const sfxVolInput = $('#sfx-volume');
+        const sfxVolInput = ui.sfxVolume;
         const vol = sfxVolInput ? sfxVolInput.value / 100 : 0.8;
         const sound = sfxClearMaster.cloneNode();
         sound.volume = vol; sound.play().catch(e => console.warn(e));
@@ -270,8 +286,8 @@ function playSfxClear() {
 }
 
 let autoHintEnabled = true;
-$('#auto-hint').addEventListener('change', (e) => { autoHintEnabled = e.target.checked; });
-$('#bgm-volume').addEventListener('input', (e) => bgmGame.volume = e.target.value / 100);
+ui.autoHint.addEventListener('change', (e) => { autoHintEnabled = e.target.checked; });
+ui.bgmVolume.addEventListener('input', (e) => bgmGame.volume = e.target.value / 100);
 
 $('#init-screen').addEventListener('click', () => {
     $('#init-screen').classList.add('hidden');
@@ -321,7 +337,7 @@ function quitToTitle() {
     if (document.exitPointerLock) document.exitPointerLock();
     $('#pause-screen').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#intro-screen').classList.remove('hidden');
     $('#main-menu').classList.remove('hidden'); $('#settings-menu').classList.add('hidden');
-    clear(); maps[Math.floor(Math.random() * maps.length)].make();
+    clear(); maps[Math.floor(Math.random() * maps.length)].make(); flushStageBatches();
 }
 
 function startGame(isTutorial) {
@@ -378,11 +394,25 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color(0xd2c696); scene.fog=new THREE.FogExp2(0xd2c696, 0.035); 
 const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.05,100);
 camera.position.set(0,1.7,8);camera.rotation.order='YXZ';
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7)); renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const renderer=new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance'});
+let renderScale = devicePixelRatio;
+function applyRenderScale() {
+    renderer.setPixelRatio(renderScale);
+    renderer.setSize(innerWidth, innerHeight);
+}
+applyRenderScale();
+renderer.shadowMap.enabled=false;
 renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0;
 $('#game').appendChild(renderer.domElement);
+window.parallaxPerf = () => ({
+    fps: currentFps,
+    avgFps: Math.round(avgFps),
+    renderScale: Number(renderScale.toFixed(2)),
+    render: {...renderer.info.render},
+    memory: {...renderer.info.memory},
+    worldObjects: world.children.length,
+    permanentObjects: permanent.children.length
+});
 
 scene.add(new THREE.HemisphereLight(0xfffae6, 0x4a4328, 1.2));
 scene.add(new THREE.AmbientLight(0xd2c696, 0.5));
@@ -392,20 +422,103 @@ const floorMat = new THREE.MeshStandardMaterial({color:0x8a7f5d, roughness:0.9, 
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(30,30), floorMat); floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; permanent.add(floor);
 const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30,30), new THREE.MeshStandardMaterial({color:0xd9d3b8, roughness:1.0})); ceiling.rotation.x = Math.PI/2; ceiling.position.y = 8; permanent.add(ceiling);
 const wallMat = new THREE.MeshStandardMaterial({color:0xc4b785, roughness:0.8, metalness:0.1});
-function makeWall(x, z, w, d) { let wall = new THREE.Mesh(new THREE.BoxGeometry(w, 8, d), wallMat); wall.position.set(x, 4, z); wall.castShadow = true; wall.receiveShadow = true; permanent.add(wall); }
+function makeWall(x, z, w, d) { let wall = new THREE.Mesh(new THREE.BoxGeometry(w, 8, d), wallMat); wall.position.set(x, 4, z); wall.receiveShadow = true; permanent.add(wall); }
 makeWall(0, -15.5, 32, 1); makeWall(0, 15.5, 32, 1); makeWall(-15.5, 0, 1, 30); makeWall(15.5, 0, 1, 30);  
 
 const gridHelper = new THREE.GridHelper(30, 30, 0xffffff, 0xffffff);
 gridHelper.position.y = 0.01; gridHelper.material.opacity = 0.12; gridHelper.material.transparent = true; permanent.add(gridHelper);
-for(let x=-10; x<=10; x+=10){ for(let z=-10; z<=10; z+=10){
+const roomLightPositions = [[-10,-10], [10,-10], [-10,10], [10,10], [0,0]];
+roomLightPositions.forEach(([x, z]) => {
     let lightMesh = new THREE.Mesh(new THREE.BoxGeometry(2,0.1,0.5), new THREE.MeshBasicMaterial({color:0xfffae6})); lightMesh.position.set(x, 7.9, z); permanent.add(lightMesh);
-    let pLight = new THREE.PointLight(0xfffae6, 0.8, 15); pLight.position.set(x, 7.5, z); permanent.add(pLight);
-}}
+    let pLight = new THREE.PointLight(0xfffae6, 0.55, 13); pLight.position.set(x, 7.5, z); permanent.add(pLight);
+});
 
-const mat=(color)=>new THREE.MeshBasicMaterial({color});
-function box(p,s,m,parent=world){let q=new THREE.Mesh(new THREE.BoxGeometry(...s),m);q.position.set(...p);parent.add(q);return q}
-function fragment(cam,original,size,depth,m){let r=new THREE.Vector3().subVectors(original,cam),old=r.length(),p=cam.clone().add(r.normalize().multiplyScalar(depth)),scale=depth/old;return box(p.toArray(),size.map(x=>x*scale),m)}
-function targetRing(p,color){let ring=new THREE.Mesh(new THREE.RingGeometry(.45,.68,40),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.85,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.set(p[0],.025,p[2]);world.add(ring);return ring}
+const sharedBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const sharedRingGeometry = new THREE.RingGeometry(.45, .68, 32);
+const basicMaterialCache = new Map();
+const ringMaterialCache = new Map();
+const instanceMatrixDummy = new THREE.Object3D();
+const fragmentOffset = new THREE.Vector3();
+const fragmentPos = new THREE.Vector3();
+const stageBatches = new Map();
+const stageMeshes = new Map();
+const instanceCapacity = 512;
+
+function mat(color){
+    const key = Number(color);
+    let cached = basicMaterialCache.get(key);
+    if (!cached) {
+        cached = new THREE.MeshBasicMaterial({color:key});
+        cached.userData.colorKey = key;
+        basicMaterialCache.set(key, cached);
+    }
+    return cached;
+}
+
+function ringMat(color) {
+    const key = Number(color);
+    let cached = ringMaterialCache.get(key);
+    if (!cached) {
+        cached = new THREE.MeshBasicMaterial({color:key, transparent:true, opacity:.85, side:THREE.DoubleSide});
+        ringMaterialCache.set(key, cached);
+    }
+    return cached;
+}
+
+function addBoxInstance(p, s, m) {
+    const key = m.userData.colorKey ?? m.color.getHex();
+    let batch = stageBatches.get(key);
+    if (!batch) {
+        batch = { material: m, items: [] };
+        stageBatches.set(key, batch);
+    }
+    batch.items.push(p[0], p[1], p[2], s[0], s[1], s[2]);
+}
+
+function flushStageBatches() {
+    stageBatches.forEach(batch => {
+        const count = batch.items.length / 6;
+        const key = batch.material.userData.colorKey;
+        let mesh = stageMeshes.get(key);
+        if (!mesh) {
+            mesh = new THREE.InstancedMesh(sharedBoxGeometry, batch.material, instanceCapacity);
+            mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            mesh.userData.origMat = batch.material;
+            mesh.userData.whiteMat = mat(0xffffff);
+            stageMeshes.set(key, mesh);
+            world.add(mesh);
+        }
+        const renderCount = Math.min(count, instanceCapacity);
+        mesh.count = renderCount;
+        mesh.material = batch.material;
+        mesh.userData.origMat = batch.material;
+        for (let i = 0; i < renderCount; i++) {
+            const offset = i * 6;
+            instanceMatrixDummy.position.set(batch.items[offset], batch.items[offset + 1], batch.items[offset + 2]);
+            instanceMatrixDummy.scale.set(batch.items[offset + 3], batch.items[offset + 4], batch.items[offset + 5]);
+            instanceMatrixDummy.updateMatrix();
+            mesh.setMatrixAt(i, instanceMatrixDummy.matrix);
+        }
+        mesh.instanceMatrix.needsUpdate = true;
+    });
+    stageBatches.clear();
+}
+
+function box(p,s,m,parent=world){
+    if (parent === world && m.userData.colorKey !== undefined) {
+        addBoxInstance(p, s, m);
+        return null;
+    }
+    let q=new THREE.Mesh(sharedBoxGeometry,m);q.position.set(...p);q.scale.set(...s);parent.add(q);return q
+}
+function fragment(cam,original,size,depth,m){
+    fragmentOffset.subVectors(original,cam);
+    const old=fragmentOffset.length();
+    const scale=depth/old;
+    fragmentPos.copy(cam).add(fragmentOffset.normalize().multiplyScalar(depth));
+    return box([fragmentPos.x, fragmentPos.y, fragmentPos.z],[size[0]*scale,size[1]*scale,size[2]*scale],m)
+}
+function targetRing(p,color){let ring=new THREE.Mesh(sharedRingGeometry,ringMat(color));ring.rotation.x=-Math.PI/2;ring.position.set(p[0],.025,p[2]);world.add(ring);return ring}
 const v=a=>new THREE.Vector3(...a);
 
 function createAsciiShape(cam, center, asciiLines, cellSize, color, isFront) {
@@ -464,56 +577,375 @@ const mapDefs = [
     { n: "피라미드", isMulti: false, hint: "층층이 나뉜 사각형들이 중심을 향해 피라미드로 모이게 하세요.", make: () => [[0,0.8,4.8,0.6],[0,1.8,3.6,0.6],[0,2.8,2.4,0.6],[0,3.8,1.2,0.6]] },
 
     { n: "맹수의 환영", isMulti: true, ans: ["호랑이", "사자"], fColor:{'#':0xff8a1f, S:0x15110b, W:0xf7f2dc}, sColor:{M:0xb66a19, '#':0xf4bd55, E:0x1b1208, W:0xf8edd4},
-      fAscii: ["SS   S   S   SS","S## SSS SSS ##S","###############","S##  W# #W  ##S","SS## S#S#S ##SS","#####SSSSS#####","S#############S","S##  SSSSS  ##S"," ##S  ###  S## ","  ##SS###SS##  ","   #########   ","    ### ###    "],
-      sAscii: ["MM   MMMMM   MM","MMM MMMMMMM MMM","MMMMMMMMMMMMMMM","MMM###MMM###MMM","MM##E#####E##MM","MM###########MM","MMM##WWWWW##MMM","MMMW#######WMMM","MMMWW#####WWMMM","MMMMWW###WWMMMM","MMMMMWWWWWMMMMM"," MMMMMMMMMMMMM ","   MMMMMMMMM   "] },
+      fAscii: [
+        "SS   S   S   SS",
+        "S## SSS SSS ##S",
+        "###############",
+        "S##  W# #W  ##S",
+        "SS## S#S#S ##SS",
+        "#####SSSSS#####",
+        "S#############S",
+        "S##  SSSSS  ##S",
+        " ##S  ###  S## ",
+        "  ##SS###SS##  ",
+        "   #########   ",
+        "    ### ###    "
+      ],
+      sAscii: [
+        "MM   MMMMM   MM",
+        "MMM MMMMMMM MMM",
+        "MMMMMMMMMMMMMMM",
+        "MMM###MMM###MMM",
+        "MM##E#####E##MM",
+        "MM###########MM",
+        "MMM##WWWWW##MMM",
+        "MMMW#######WMMM",
+        "MMMWW#####WWMMM",
+        "MMMMWW###WWMMMM",
+        "MMMMMWWWWWMMMMM",
+        " MMMMMMMMMMMMM ",
+        "   MMMMMMMMM   "
+      ] },
 
     { n: "낮과 밤", isMulti: true, ans: ["해", "달"], fColor:{'#':0xffd447, H:0xff8a2a}, sColor:0x8de8ff,
-      fAscii: ["      H        ","   H  H  H     ","    HHHHH      ","   HH####HH    ","  HHH####HH    ","   HH####HH    ","    HHHHH      ","   H  H  H     ","       H       ","       H       "],
-      sAscii: ["      #####    ","    #######    ","   #######     ","  ######       ","  #####        ","  #####        ","  ######       ","   #######     ","    #######    ","      #####    "] },
+      fAscii: [
+        "      H        ",
+        "   H  H  H     ",
+        "    HHHHH      ",
+        "   HH####HH    ",
+        "  HHH####HH    ",
+        "   HH####HH    ",
+        "    HHHHH      ",
+        "   H  H  H     ",
+        "       H       ",
+        "       H       "
+      ],
+      sAscii: [
+        "      #####    ",
+        "    #######    ",
+        "   #######     ",
+        "  ######       ",
+        "  #####        ",
+        "  #####        ",
+        "  ######       ",
+        "   #######     ",
+        "    #######    ",
+        "      #####    "
+      ] },
 
     { n: "산과 빙산", isMulti: true, ans: ["산", "빙산"], fColor:{'#':0x2f9d55, S:0xd8f5e1}, sColor:{I:0xdff8ff, '#':0xffffff, B:0x7fd8ff, D:0x2e9ee8},
-      fAscii: ["       #       ","      ###      ","     #####     ","    #######    ","   #########   ","  ###########  "," ############# ","###############","###############","###############"],
-      sAscii: ["       #       ","      ###      ","     #####     ","    ##III##    ","   ##IIIII##   ","  BBBBBBBBBBB  "," DDBBBBBBBBBDD ","DDDDDDDDDDDDDDD"] },
+      fAscii: [
+        "       #       ",
+        "      ###      ",
+        "     #####     ",
+        "    #######    ",
+        "   #########   ",
+        "  ###########  ",
+        " ############# ",
+        "###############",
+        "###############",
+        "###############"
+      ],
+      sAscii: [
+        "       #       ",
+        "      ###      ",
+        "     #####     ",
+        "    ##III##    ",
+        "   ##IIIII##   ",
+        "  BBBBBBBBBBB  ",
+        " DDBBBBBBBBBDD ",
+        "DDDDDDDDDDDDDDD"
+      ] },
 
     { n: "전투의 상징", isMulti: true, ans: ["칼", "방패"], fColor:{B:0xdfe8f0, G:0xd4a23a, H:0x5b3418}, sColor:{'#':0x254f8f, E:0xd2b15f, R:0xb3322b},
-      fAscii: ["       B       ","      BBB      ","       B       ","       B       ","       B       ","       B       ","       B       ","       B       ","       B       ","    GGGGGGG    ","       H       ","       H       ","      HHH      "],
-      sAscii: ["   EEEEEEEEE   ","  E#########E  "," E###RRRRR###E ","E####R###R####E","E#####R#R#####E","E######R######E"," E####R#R####E ","  E##R###R##E  ","   E#######E   ","    E#####E    ","     E###E     ","       E       "] },
+      fAscii: [
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "       B       ",
+        "    GGGGGGG    ",
+        "       H       ",
+        "       H       ",
+        "      HHH      "
+      ],
+      sAscii: [
+        "   EEEEEEEEE   ",
+        "  E#########E  ",
+        " E###RRRRR###E ",
+        "E####R###R####E",
+        "E#####R#R#####E",
+        "E######R######E",
+        " E####R#R####E ",
+        "  E##R###R##E  ",
+        "   E#######E   ",
+        "    E#####E    ",
+        "     E###E     ",
+        "       E       "
+      ] },
 
     { n: "공중과 수중", isMulti: true, ans: ["새", "물고기"], fColor:0x35e6c4, sColor:0xffb347,
-      fAscii: ["#             #","##           ##","###         ###","####   #   ####"," ##### # ##### ","  ###########  ","   #########   ","     #####     ","      ###      ","       #       "],
-      sAscii: ["      ##       ","    ######   # ","  ######### ## ","###############"," ##############","  ######### ## ","    ######   # ","      ##       "] },
+      fAscii: [
+        "#             #",
+        "##           ##",
+        "###         ###",
+        "####   #   ####",
+        " ##### # ##### ",
+        "  ###########  ",
+        "   #########   ",
+        "     #####     ",
+        "      ###      ",
+        "       #       "
+      ],
+      sAscii: [
+        "      ##       ",
+        "    ######   # ",
+        "  ######### ## ",
+        "###############",
+        " ##############",
+        "  ######### ## ",
+        "    ######   # ",
+        "      ##       "
+      ] },
 
     { n: "원소의 대립", isMulti: true, ans: ["불", "물"], fColor:{R:0xff2d1f, O:0xff8a1f, Y:0xffe04a}, sColor:{'#':0x1b8cff, H:0xbdefff},
-      fAscii: ["       Y       ","      OYO      ","     OOYOO     ","    ROOY OOR   ","   RROOOOORR   ","  RROOYYY OOR  "," RROOOYYYOOORR ","RRROOOYYYOOORRR"," RROOOYYYOOORR ","  RROOOOOOORR  ","   RROOOOORR   ","    RRRRRRR    "],
-      sAscii: ["     HHHHH     ","   H#######H   ","  H###H#####H  "," H#######H###H ","H#####H#######H","H#############H","H#############H","H#############H"," H###########H ","  H#########H  ","   H#######H   ","     HHHHH     "] },
+      fAscii: [
+        "       Y       ",
+        "      OYO      ",
+        "     OOYOO     ",
+        "    ROOY OOR   ",
+        "   RROOOOORR   ",
+        "  RROOYYY OOR  ",
+        " RROOOYYYOOORR ",
+        "RRROOOYYYOOORRR",
+        " RROOOYYYOOORR ",
+        "  RROOOOOOORR  ",
+        "   RROOOOORR   ",
+        "    RRRRRRR    "
+      ],
+      sAscii: [
+        "     HHHHH     ",
+        "   H#######H   ",
+        "  H###H#####H  ",
+        " H#######H###H ",
+        "H#####H#######H",
+        "H#############H",
+        "H#############H",
+        "H#############H",
+        " H###########H ",
+        "  H#########H  ",
+        "   H#######H   ",
+        "     HHHHH     "
+      ] },
 
     { n: "왕실의 보물", isMulti: true, ans: ["왕관", "보석"], fColor:0xffdf35, sColor:0xb56bff,
-      fAscii: ["#      #      #","##    ###    ##","###  #####  ###","###############"," ############# "," ############# ","###############","###############"],
-      sAscii: ["     #####     ","    #######    ","   #########   ","  ###########  "," ############# ","###############"," ############# ","  ###########  ","   #########   ","    #######    ","      ###      ","       #       "] },
+      fAscii: [
+        "#      #      #",
+        "##    ###    ##",
+        "###  #####  ###",
+        "###############",
+        " ############# ",
+        " ############# ",
+        "###############",
+        "###############"
+      ],
+      sAscii: [
+        "     #####     ",
+        "    #######    ",
+        "   #########   ",
+        "  ###########  ",
+        " ############# ",
+        "###############",
+        " ############# ",
+        "  ###########  ",
+        "   #########   ",
+        "    #######    ",
+        "      ###      ",
+        "       #       "
+      ] },
 
     { n: "정원의 정취", isMulti: true, ans: ["나무", "꽃"], fColor:{'#':0x2fc96f, T:0x8b4a1f}, sColor:{P:0xff70b8, O:0xffd34d, L:0x2fc96f, T:0x31b86b},
-      fAscii: ["     #####     ","   #########   ","  ###########  "," ############# ","###############"," ############# ","   #########   ","      TTT      ","      TTT      ","      TTT      ","     TTTTT     ","     TTTTT     "],
-      sAscii: ["      PPP      ","     PPPPP     ","    PPPOPPP    ","   PPPOOOPPP   ","    PPPOPPP    ","     PPPPP     ","      PPP      ","       T       ","      LTL      ","     LLTLL     ","       T       "] },
+      fAscii: [
+        "     #####     ",
+        "   #########   ",
+        "  ###########  ",
+        " ############# ",
+        "###############",
+        " ############# ",
+        "   #########   ",
+        "      TTT      ",
+        "      TTT      ",
+        "      TTT      ",
+        "     TTTTT     ",
+        "     TTTTT     "
+      ],
+      sAscii: [
+        "      PPP      ",
+        "     PPPPP     ",
+        "    PPPOPPP    ",
+        "   PPPOOOPPP   ",
+        "    PPPOPPP    ",
+        "     PPPPP     ",
+        "      PPP      ",
+        "       T       ",
+        "      LTL      ",
+        "     LLTLL     ",
+        "       T       "
+      ] },
 
     { n: "하늘의 기호", isMulti: true, ans: ["하트", "별"], fColor:0xff4f88, sColor:0xffd23f,
-      fAscii: ["  ####   ####  "," ###### ###### ","###############","###############"," ############# ","  ###########  ","   #########   ","    #######    ","     #####     ","      ###      ","       #       "],
-      sAscii: ["       #       ","      ###      ","      ###      ","     #####     ","###############","  ###########  ","    #######    ","   #########   ","  ####   ####  "," ####     #### ","##           ##"] },
+      fAscii: [
+        "  ####   ####  ",
+        " ###### ###### ",
+        "###############",
+        "###############",
+        " ############# ",
+        "  ###########  ",
+        "   #########   ",
+        "    #######    ",
+        "     #####     ",
+        "      ###      ",
+        "       #       "
+      ],
+      sAscii: [
+        "       #       ",
+        "      ###      ",
+        "      ###      ",
+        "     #####     ",
+        "###############",
+        "  ###########  ",
+        "    #######    ",
+        "   #########   ",
+        "  ####   ####  ",
+        " ####     #### ",
+        "##           ##"
+      ] },
 
     { n: "비밀의 문", isMulti: true, ans: ["열쇠", "자물쇠"], fColor:0xf6d74a, sColor:0x98a1ad,
-      fAscii: ["    #######    ","   #########   ","   ###   ###   ","   ###   ###   ","   #########   ","    #######    ","       ###     ","       ###     ","       ####### ","       ###  ## ","       #####   ","       ###     "],
-      sAscii: ["     #####     ","   #########   ","  ####   ####  ","  ###     ###  ","  ###     ###  ","###############","###############","###############","######   ######","######   ######","###############","###############"] },
+      fAscii: [
+        "    #######    ",
+        "   #########   ",
+        "   ###   ###   ",
+        "   ###   ###   ",
+        "   #########   ",
+        "    #######    ",
+        "       ###     ",
+        "       ###     ",
+        "       ####### ",
+        "       ###  ## ",
+        "       #####   ",
+        "       ###     "
+      ],
+      sAscii: [
+        "     #####     ",
+        "   #########   ",
+        "  ####   ####  ",
+        "  ###     ###  ",
+        "  ###     ###  ",
+        "###############",
+        "###############",
+        "###############",
+        "######   ######",
+        "######   ######",
+        "###############",
+        "###############"
+      ] },
 
-    { n: "반려의 미학", isMulti: true, ans: ["고양이", "강아지"], fColor:{'#':0xf08a2b, W:0xf7edd7, E:0x1a120b, N:0x1a120b}, sColor:{'#':0x66788d, E:0x111820, N:0x111820},
-      fAscii: ["##           ##","###         ###","####       ####","###############","#####E###E#####","###############","WWWW###N###WWWW","###############","WWWW#####WWWWW ","  ###########  ","   #########   ","    ##   ##    "],
-      sAscii: ["   ###         ","  #####        "," #######   ##  ","####E###E##### ","#######N#######","  ###########  ","   #########   ","    #######    ","    ### ###    ","    ### ###    "] },
+    { n: "반려의 미학", isMulti: true, ans: ["고양이", "강아지"], fColor:{'#':0xf08a2b, W:0xf7edd7, E:0x1a120b, N:0x1a120b}, sColor:{'#':0xf4f1e8, E:0x111820, N:0x111820},
+      fAscii: [
+        "##           ##",
+        "###         ###",
+        "####       ####",
+        "###############",
+        "#####E###E#####",
+        "###############",
+        "WWWW###N###WWWW",
+        "###############",
+        "WWWW#####WWWWW ",
+        "  ###########  ",
+        "   #########   ",
+        "    ##   ##    "
+      ],
+      sAscii: [
+        "   ###         ",
+        "  #####        ",
+        " #######   ##  ",
+        "##E#E##########",
+        "###############",
+        "  ###########  ",
+        "   #########   ",
+        "    #######    ",
+        "    ### ###    ",
+        "    ### ###    "
+      ] },
 
     { n: "건반의 선율", isMulti: true, ans: ["건반", "기타"], fColor:{W:0xf5f7fb, B:0x050608, '#':0x050608}, sColor:{'#':0x9b5b2e, S:0xe0c07a, H:0x5b3418},
-      fAscii: ["###############","#WWWWWWWWWWWWW#","#WBWBWWBWBWWBW#","#WBWBWWBWBWWBW#","#WWWWWWWWWWWWW#","#WBWBWWBWBWWBW#","#WBWBWWBWBWWBW#","###############"],
-      sAscii: ["      HHH      ","       S       ","       S       ","       S       ","       S       ","       S       ","       S       ","      ###      ","     #####     ","    #######    ","     #####     ","      ###      ","     ## ##     "] },
+      fAscii: [
+        "###############",
+        "#WWWWWWWWWWWWW#",
+        "#WBWBWWBWBWWBW#",
+        "#WBWBWWBWBWWBW#",
+        "#WWWWWWWWWWWWW#",
+        "#WBWBWWBWBWWBW#",
+        "#WBWBWWBWBWWBW#",
+        "###############"
+      ],
+      sAscii: [
+        "      HHH      ",
+        "       S       ",
+        "       S       ",
+        "       S       ",
+        "       S       ",
+        "       S       ",
+        "       S       ",
+        "      ###      ",
+        "     #####     ",
+        "    #######    ",
+        "     #####     ",
+        "      ###      ",
+        "     ## ##     "
+      ] },
 
     { n: "체스의 대결", isMulti: true, ans: [["킹", "왕"], ["비숍", "주교"]], fColor:{'#':0xf4f1e8, C:0xd9c98f}, sColor:{'#':0x2c3038, C:0xb7bdc9},
-      fAscii: ["       C       ","      CCC      ","     CCCCC     ","       C       ","    #######    ","   #########   ","    #######    ","   #########   ","  ###########  "," ###########   ","    #####      ","  ###########  "," ############# ","###############"],
-      sAscii: ["    #######    ","   #########   ","  #######      "," #######       "," ######   ###  "," ######  ##### "," ############# ","  ###########  ","    #######    ","    #######    ","   #########   ","  ###########  ","###############"] }
+      fAscii: [
+        "       #       ",
+        "       #       ",
+        "    #######    ",
+        "       #       ",
+        "       #       ",
+        "   #  ###  #   ",
+        "   ## ### ##   ",
+        "   #########   ",
+        "    #######    ",
+        "    #######    ",
+        "   #########   ",
+        "     #####     ",
+        "   #########   ",
+        "    #######    ",
+        "    #######    ",
+        "   #########   ",
+        "  ###########  ",
+        "###############"
+      ],
+      sAscii: [
+        "    #######    ",
+        "   #########   ",
+        "  #######      ",
+        " #######       ",
+        " ######   ###  ",
+        " ######  ##### ",
+        " ############# ",
+        "  ###########  ",
+        "    #######    ",
+        "    #######    ",
+        "   #########   ",
+        "  ###########  ",
+        "###############"
+      ] }
 ];
 
 const multiViewSets = [
@@ -543,6 +975,7 @@ const maps = mapDefs.map((def, idx) => {
         desc: def.isMulti ? "정면과 측면에서 관찰하여 두 물체를 알아내세요." : "분리된 구조물이 완벽한 하나로 합성되는 각도를 찾으세요.",
         hint: def.hint || "",
         pos: basePos, look: baseLook, color: def.fColor || 0x79e4ff,
+        basePos, baseLook, baseViewSet: viewSet,
         isMultiView: def.isMulti,
         viewSet,
         answers: def.ans || [],
@@ -565,9 +998,79 @@ const maps = mapDefs.map((def, idx) => {
 
 let currentIdx = 0, targetCamPos = new THREE.Vector3(), targetLookAt = new THREE.Vector3();
 let hintRings = [];
+let stageStartTime = performance.now(), autoHintShown = false;
+const scoreCurrentDir = new THREE.Vector3();
+const scoreTargetDir = new THREE.Vector3();
+const initLookTarget = new THREE.Vector3(0, 1.7, 0);
+const exactDirVec = new THREE.Vector3();
+const tempEuler = new THREE.Euler();
+
+const randomRange = (min, max) => min + Math.random() * (max - min);
+
+function randomStageCenter() {
+    return new THREE.Vector3(randomRange(-3.2, 3.2), 2.5, randomRange(-4.2, 2.8));
+}
+
+function randomizeStagePose(stage) {
+    const center = randomStageCenter();
+    const angle = randomRange(-0.4, 0.4);
+    const frontDistance = randomRange(5.8, 8.6);
+    const sideDistance = randomRange(5.8, 8.6);
+
+    const front = new THREE.Vector3(
+        center.x + Math.sin(angle) * frontDistance,
+        1.7,
+        center.z + Math.cos(angle) * frontDistance
+    );
+
+    stage.pos = front.toArray();
+    stage.look = center.toArray();
+
+    if (stage.isMultiView) {
+        const sideAngle = angle + Math.PI / 2 + randomRange(-0.32, 0.32);
+        const side = new THREE.Vector3(
+            center.x + Math.sin(sideAngle) * sideDistance,
+            1.7,
+            center.z + Math.cos(sideAngle) * sideDistance
+        );
+
+        stage.viewSet = {
+            front: front.toArray(),
+            side: side.toArray(),
+            center: center.toArray()
+        };
+    }
+}
 
 function clearRings() { hintRings.forEach(r => world.remove(r)); hintRings = []; }
-function clear(){ while(world.children.length) world.remove(world.children[0]); clearRings(); }
+function clear(){ stageBatches.clear(); clearRings(); stageMeshes.forEach(mesh => { mesh.count = 0; mesh.material = mesh.userData.origMat; }); }
+
+function revealStageHint() {
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    let m = activeMaps[currentIdx];
+    if (!m) return;
+
+    if (!isTutorialMode && m.isMultiView && m.answers) {
+        if (ui.cornerAnswer) {
+            const displayAnswer = answer => Array.isArray(answer) ? answer[0] : answer;
+            ui.cornerAnswer.textContent = `정답: ${displayAnswer(m.answers[0])}, ${displayAnswer(m.answers[1])}`;
+            ui.cornerAnswer.style.display = 'block';
+        }
+        ui.objectiveCorner.classList.add('show');
+        showHint(`💡 오른쪽 상단에 정답이 표시되었습니다.`);
+    } else {
+        showHint(`💡 힌트: ${m.hint}`);
+    }
+
+    if (hintRings.length === 0) {
+        if (m.isMultiView) {
+            hintRings.push(targetRing(m.viewSet.front, 0x79e4ff));
+            hintRings.push(targetRing(m.viewSet.side, 0xffd166));
+        } else {
+            hintRings.push(targetRing([targetCamPos.x, 0.025, targetCamPos.z], 0x79e4ff));
+        }
+    }
+}
 
 function showLevelPopup(map) {
     let activeMaps = isTutorialMode ? tutorialMaps : maps;
@@ -575,10 +1078,9 @@ function showLevelPopup(map) {
     $('#level').textContent = levelText; $('#title').textContent = map.name; $('#text').textContent = map.desc;
     $('#level-popup').classList.remove('show'); $('#objective-corner').classList.remove('show');
     
-    const cornerAns = $('#corner-answer');
-    if (cornerAns) {
-        cornerAns.style.display = 'none';
-        cornerAns.textContent = '';
+    if (ui.cornerAnswer) {
+        ui.cornerAnswer.style.display = 'none';
+        ui.cornerAnswer.textContent = '';
     }
 
     if (popupTimer) clearTimeout(popupTimer);
@@ -661,11 +1163,15 @@ renderer.domElement.addEventListener('click', () => {
 });
 
 function load(idx){
-    currentIdx = idx; clear(); let activeMaps = isTutorialMode ? tutorialMaps : maps; let m = activeMaps[idx]; m.make();
+    currentIdx = idx; clear(); let activeMaps = isTutorialMode ? tutorialMaps : maps; let m = activeMaps[idx];
+    stageStartTime = performance.now(); autoHintShown = false;
+    if (!isTutorialMode) randomizeStagePose(m);
+    m.make();
+    flushStageBatches();
     targetCamPos.set(...m.pos); targetLookAt.set(...m.look);
     
     camera.position.set(0, 1.7, 13.0);
-    let initDir = new THREE.Vector3().subVectors(new THREE.Vector3(0, 1.7, 0), camera.position).normalize();
+    let initDir = scoreTargetDir.subVectors(initLookTarget, camera.position).normalize();
     yaw = Math.atan2(-initDir.x, -initDir.z); pitch = Math.asin(initDir.y); 
     camera.rotation.set(pitch, yaw, 0, 'YXZ');
     
@@ -686,17 +1192,31 @@ function getAlignmentScore() {
     let activeMaps = isTutorialMode ? tutorialMaps : maps;
     let progress = activeMaps.length > 1 ? currentIdx / (activeMaps.length - 1) : 0; 
     
-    let posTolerance = 3.5 - (progress * 2.0);
-    let angleTolerance = 0.45 - (progress * 0.27);
+    let posTolerance = isTutorialMode ? 3.2 - (progress * 1.0) : 2.1 - (progress * 0.45);
+    let angleTolerance = isTutorialMode ? 0.4 - (progress * 0.12) : 0.22 - (progress * 0.05);
 
     let posDist = camera.position.distanceTo(targetCamPos);
-    let currentDir = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).normalize();
-    let targetDir = new THREE.Vector3().subVectors(targetLookAt, targetCamPos).normalize();
-    let angleDiff = currentDir.angleTo(targetDir);
+    scoreCurrentDir.set(0,0,-1).applyQuaternion(camera.quaternion).normalize();
+    scoreTargetDir.subVectors(targetLookAt, targetCamPos).normalize();
+    let angleDiff = scoreCurrentDir.angleTo(scoreTargetDir);
     
     let posScore = Math.max(0, 1 - (posDist / posTolerance)); 
     let angleScore = Math.max(0, 1 - (angleDiff / angleTolerance));
     return Math.pow((posScore * 0.5) + (angleScore * 0.5), 2); 
+}
+
+function canClearCurrentPuzzle() {
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    let progress = activeMaps.length > 1 ? currentIdx / (activeMaps.length - 1) : 0;
+    let posLimit = isTutorialMode ? 1.6 : 1.2 - (progress * 0.2);
+    let angleLimit = isTutorialMode ? 0.2 : 0.14 - (progress * 0.025);
+
+    let posDist = camera.position.distanceTo(targetCamPos);
+    scoreCurrentDir.set(0,0,-1).applyQuaternion(camera.quaternion).normalize();
+    scoreTargetDir.subVectors(targetLookAt, targetCamPos).normalize();
+    let angleDiff = scoreCurrentDir.angleTo(scoreTargetDir);
+
+    return posDist <= posLimit && angleDiff <= angleLimit;
 }
 
 const keys={}; let yaw=0, pitch=0;
@@ -737,28 +1257,7 @@ addEventListener('keydown', e => {
         }
 
         if (e.code === 'KeyZ' && started && !isPaused) {
-            let m = activeMaps[currentIdx];
-            if (!isTutorialMode && m.isMultiView && m.answers) {
-                const cornerAns = $('#corner-answer');
-                if (cornerAns) {
-                    const displayAnswer = answer => Array.isArray(answer) ? answer[0] : answer;
-                    cornerAns.textContent = `정답: ${displayAnswer(m.answers[0])}, ${displayAnswer(m.answers[1])}`;
-                    cornerAns.style.display = 'block';
-                }
-                $('#objective-corner').classList.add('show');
-                showHint(`💡 오른쪽 상단에 정답이 표시되었습니다.`);
-            } else {
-                showHint(`💡 힌트: ${m.hint}`);
-            }
-
-            if (hintRings.length === 0) {
-                if (m.isMultiView) {
-                    hintRings.push(targetRing(m.viewSet.front, 0x79e4ff));
-                    hintRings.push(targetRing(m.viewSet.side, 0xffd166));
-                } else {
-                    hintRings.push(targetRing([targetCamPos.x, 0.025, targetCamPos.z], 0x79e4ff));
-                }
-            }
+            revealStageHint();
             return;
         }
     }
@@ -786,7 +1285,7 @@ addEventListener('mousemove', e => {
 
 function showHint(msg){ let h = $('#hint'); h.textContent = msg; h.classList.add('show'); setTimeout(() => h.classList.remove('show'), 4000); }
 
-let lastTime = performance.now(), started = false;
+let lastTime = performance.now(), fpsLastUpdate = performance.now(), fpsFrames = 0, currentFps = 0, avgFps = 0, lastScoreUpdate = 0, rawScore = 0, displayScore = 0, started = false;
 let isAnimatingClear = false; let clearAnimTime = 0; let isTransitioning = false;
 let startCamPos = new THREE.Vector3(); let startCamQuat = new THREE.Quaternion(); let targetCamQuat = new THREE.Quaternion();
 
@@ -795,17 +1294,13 @@ function onPuzzleCleared() {
     playSfxClear();
 
     startCamPos.copy(camera.position); startCamQuat.copy(camera.quaternion);
-    let exactDir = new THREE.Vector3().subVectors(targetLookAt, targetCamPos).normalize();
+    let exactDir = exactDirVec.subVectors(targetLookAt, targetCamPos).normalize();
     let dummyCam = new THREE.PerspectiveCamera();
     dummyCam.rotation.set(Math.asin(exactDir.y), Math.atan2(-exactDir.x, -exactDir.z), 0, 'YXZ');
     targetCamQuat.copy(dummyCam.quaternion);
     
     world.children.forEach(child => { 
-        if(child.isMesh && child.geometry.type === 'BoxGeometry') { 
-            child.userData.origMat = child.material.clone();
-            child.userData.whiteMat = child.material.clone();
-            child.userData.whiteMat.color.setHex(0xffffff);
-        } 
+        if(child.isMesh && child.userData.origMat) child.material = child.userData.origMat;
     });
 }
 
@@ -829,10 +1324,18 @@ function nextStageTransition() {
     }, 800); 
 }
 
-maps[Math.floor(Math.random() * maps.length)].make();
+maps[Math.floor(Math.random() * maps.length)].make(); flushStageBatches();
 
 function animate(now) {
     requestAnimationFrame(animate);
+    fpsFrames++;
+    if (now - fpsLastUpdate >= 500) {
+        currentFps = Math.round((fpsFrames * 1000) / (now - fpsLastUpdate));
+        avgFps = avgFps ? (avgFps * 0.82) + (currentFps * 0.18) : currentFps;
+        fpsFrames = 0;
+        fpsLastUpdate = now;
+        if (ui.fpsCounter) ui.fpsCounter.textContent = `FPS ${currentFps.toString().padStart(2, '0')} AVG ${Math.round(avgFps).toString().padStart(2, '0')}`;
+    }
     let dt = Math.min((now - lastTime) / 1000, 0.1); lastTime = now;
     
     if (inMenu && !started) {
@@ -853,8 +1356,8 @@ function animate(now) {
         camera.position.lerpVectors(startCamPos, targetCamPos, easeT);
         camera.quaternion.slerpQuaternions(startCamQuat, targetCamQuat, easeT);
         
-        let euler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
-        pitch = euler.x; yaw = euler.y;
+        tempEuler.setFromQuaternion(camera.quaternion, 'YXZ');
+        pitch = tempEuler.x; yaw = tempEuler.y;
 
         let isWhite = Math.floor(clearAnimTime / 0.25) % 2 === 1;
 
@@ -873,23 +1376,41 @@ function animate(now) {
         if (!isInputFocused) {
             camera.rotation.set(pitch, yaw, 0, 'YXZ');
             let moveSpeed = (keys.ShiftLeft || keys.ShiftRight ? 8.0 : 4.0) * dt;
-            let forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize(), side = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize(), move = new THREE.Vector3();
-            if (keys.KeyW) move.add(forward); if (keys.KeyS) move.sub(forward); if (keys.KeyD) move.add(side); if (keys.KeyA) move.sub(side); 
-            if (move.lengthSq() > 0) { move.normalize().multiplyScalar(moveSpeed); camera.position.add(move); camera.position.x = Math.max(-14, Math.min(14, camera.position.x)); camera.position.z = Math.max(-14, Math.min(14, camera.position.z)); }
+            let sinYaw = Math.sin(yaw), cosYaw = Math.cos(yaw), moveX = 0, moveZ = 0;
+            if (keys.KeyW) { moveX -= sinYaw; moveZ -= cosYaw; }
+            if (keys.KeyS) { moveX += sinYaw; moveZ += cosYaw; }
+            if (keys.KeyD) { moveX += cosYaw; moveZ -= sinYaw; }
+            if (keys.KeyA) { moveX -= cosYaw; moveZ += sinYaw; }
+            let moveLen = Math.hypot(moveX, moveZ);
+            if (moveLen > 0) {
+                camera.position.x += (moveX / moveLen) * moveSpeed;
+                camera.position.z += (moveZ / moveLen) * moveSpeed;
+                camera.position.x = Math.max(-14, Math.min(14, camera.position.x));
+                camera.position.z = Math.max(-14, Math.min(14, camera.position.z));
+            }
         }
     }
 
-    let rawScore = getAlignmentScore(), displayScore = Math.floor(rawScore * 100);
-    $('#fill').style.width = `${displayScore}%`; $('#score').textContent = `정렬도 ${displayScore.toString().padStart(2, '0')}%`;
+    if (now - lastScoreUpdate >= 66) {
+        rawScore = getAlignmentScore();
+        displayScore = Math.floor(rawScore * 100);
+        ui.fill.style.width = `${displayScore}%`;
+        ui.score.textContent = `정렬도 ${displayScore.toString().padStart(2, '0')}%`;
+        if (autoHintEnabled && !autoHintShown && !isAnimatingClear && now - stageStartTime >= 120000) {
+            autoHintShown = true;
+            revealStageHint();
+        }
+        lastScoreUpdate = now;
+    }
     
     let activeMaps = isTutorialMode ? tutorialMaps : maps;
-    if (!activeMaps[currentIdx].isMultiView && (rawScore >= 0.899 || displayScore >= 90) && !isAnimatingClear) { 
+    if (!activeMaps[currentIdx].isMultiView && rawScore >= 0.9 && canClearCurrentPuzzle() && !isAnimatingClear) { 
         onPuzzleCleared(); 
     } 
 
     renderer.render(scene, camera);
 }
-addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); applyRenderScale(); });
 requestAnimationFrame(animate);
 </script>
 </body>
