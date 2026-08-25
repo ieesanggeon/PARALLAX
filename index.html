@@ -409,7 +409,8 @@ function targetRing(p,color){let ring=new THREE.Mesh(new THREE.RingGeometry(.45,
 const v=a=>new THREE.Vector3(...a);
 
 function createAsciiShape(cam, center, asciiLines, cellSize, color, isFront) {
-    let c = mat(color);
+    const palette = (typeof color === 'object') ? color : {'#': color, default: color};
+    const materialCache = {};
     let numRows = asciiLines.length;
     let numCols = asciiLines[0].length;
     let startY = (numRows / 2) * cellSize;
@@ -419,6 +420,8 @@ function createAsciiShape(cam, center, asciiLines, cellSize, color, isFront) {
         for (let col = 0; col < line.length; col++) {
             let char = line[col];
             if (char !== ' ') {
+                let fillColor = palette[char] || palette.default || palette['#'];
+                let c = materialCache[fillColor] || (materialCache[fillColor] = mat(fillColor));
                 let offX = startX + col * cellSize;
                 let offY = startY - r * cellSize;
                 
@@ -428,20 +431,20 @@ function createAsciiShape(cam, center, asciiLines, cellSize, color, isFront) {
 
                 let depthSeed = ((r * 7 + col * 13) % 9);
                 let depth = 3.0 + depthSeed * 0.45;
-                let sz = [cellSize * 0.9, cellSize * 0.9, cellSize * 0.9];
+                let sz = [cellSize * 1.08, cellSize * 1.08, cellSize * 0.9];
                 fragment(cam, orig, sz, depth, c);
             }
         }
     });
 }
 
-function makeMultiViewMesh(frontAscii, sideAscii, frontColor, sideColor) {
-    const frontCam = new THREE.Vector3(0, 1.7, 5);
-    const sideCam = new THREE.Vector3(5, 1.7, -3);
-    const center = new THREE.Vector3(0, 2.5, -3);
+function makeMultiViewMesh(frontAscii, sideAscii, frontColor, sideColor, viewSet) {
+    const center = new THREE.Vector3(...(viewSet?.center || [0, 2.5, -3]));
+    const frontCam = new THREE.Vector3(...(viewSet?.front || [0, 1.7, 5]));
+    const sideCam = new THREE.Vector3(...(viewSet?.side || [5, 1.7, -3]));
 
-    createAsciiShape(frontCam, center, frontAscii, 0.35, frontColor, true);
-    createAsciiShape(sideCam, center, sideAscii, 0.35, sideColor, false);
+    createAsciiShape(frontCam, center, frontAscii, 0.28, frontColor, true);
+    createAsciiShape(sideCam, center, sideAscii, 0.28, sideColor, false);
 }
 
 const tutorialMaps = [
@@ -460,62 +463,80 @@ const mapDefs = [
     { n: "격자 창문", isMulti: false, hint: "십자선과 외곽 창틀이 정중앙에서 교차하도록 각도를 조정하세요.", make: () => [[-1.6,2.5,0.4,3.2],[1.6,2.5,0.4,3.2],[0,4.1,3.6,0.4],[0,0.9,3.6,0.4],[0,2.5,0.3,2.8],[0,2.5,2.9,0.3]] },
     { n: "피라미드", isMulti: false, hint: "층층이 나뉜 사각형들이 중심을 향해 피라미드로 모이게 하세요.", make: () => [[0,0.8,4.8,0.6],[0,1.8,3.6,0.6],[0,2.8,2.4,0.6],[0,3.8,1.2,0.6]] },
 
-    { n: "맹수의 환영", isMulti: true, ans: ["호랑이", "사자"], fColor:0xffa500, sColor:0xffd700,
-      fAscii: ["  #     #  "," ###   ### ","###########","## # # # ##","###########"," ### # ### ","  #######  ","   #####   "],
-      sAscii: ["  #######  "," ######### ","###  #  ###","### ### ###","###  #  ###"," ######### ","  #######  ","    ###    "] },
+    { n: "맹수의 환영", isMulti: true, ans: ["호랑이", "사자"], fColor:{'#':0xff8a1f, S:0x15110b, W:0xf7f2dc}, sColor:{M:0xb66a19, '#':0xf4bd55, E:0x1b1208, W:0xf8edd4},
+      fAscii: ["SS   S   S   SS","S## SSS SSS ##S","###############","S##  W# #W  ##S","SS## S#S#S ##SS","#####SSSSS#####","S#############S","S##  SSSSS  ##S"," ##S  ###  S## ","  ##SS###SS##  ","   #########   ","    ### ###    "],
+      sAscii: ["MM   MMMMM   MM","MMM MMMMMMM MMM","MMMMMMMMMMMMMMM","MMM###MMM###MMM","MM##E#####E##MM","MM###########MM","MMM##WWWWW##MMM","MMMW#######WMMM","MMMWW#####WWMMM","MMMMWW###WWMMMM","MMMMMWWWWWMMMMM"," MMMMMMMMMMMMM ","   MMMMMMMMM   "] },
 
-    { n: "낮과 밤", isMulti: true, ans: ["해", "달"], fColor:0xff4500, sColor:0x00ffff,
-      fAscii: ["  #  #  #  ","   #####   "," # ####### ","###########"," # ####### ","   #####   ","  #  #  #  "],
-      sAscii: ["   ##### ","  ###### "," ####    "," ####    "," ####    ","  ###### ","   ##### "] },
+    { n: "낮과 밤", isMulti: true, ans: ["해", "달"], fColor:{'#':0xffd447, H:0xff8a2a}, sColor:0x8de8ff,
+      fAscii: ["      H        ","   H  H  H     ","    HHHHH      ","   HH####HH    ","  HHH####HH    ","   HH####HH    ","    HHHHH      ","   H  H  H     ","       H       ","       H       "],
+      sAscii: ["      #####    ","    #######    ","   #######     ","  ######       ","  #####        ","  #####        ","  ######       ","   #######     ","    #######    ","      #####    "] },
 
-    { n: "자연의 형상", isMulti: true, ans: ["산", "바다"], fColor:0x2ecc71, sColor:0x3498db,
-      fAscii: ["     #     ","    ###    ","  # #####  "," ######### ","###########"],
-      sAscii: ["  ##      ##  "," ####    #### ","######  ######","##############"] },
+    { n: "산과 빙산", isMulti: true, ans: ["산", "빙산"], fColor:{'#':0x2f9d55, S:0xd8f5e1}, sColor:{I:0xdff8ff, '#':0xffffff, B:0x7fd8ff, D:0x2e9ee8},
+      fAscii: ["       #       ","      ###      ","     #####     ","    #######    ","   #########   ","  ###########  "," ############# ","###############","###############","###############"],
+      sAscii: ["       #       ","      ###      ","     #####     ","    ##III##    ","   ##IIIII##   ","  BBBBBBBBBBB  "," DDBBBBBBBBBDD ","DDDDDDDDDDDDDDD"] },
 
-    { n: "전투의 상징", isMulti: true, ans: ["칼", "방패"], fColor:0xe74c3c, sColor:0x9b59b6,
-      fAscii: ["    #    ","    #    ","    #    ","    #    ","  #####  ","    #    ","    #    ","    #    "],
-      sAscii: [" ####### ","#########","#########"," ####### ","  #####  ","   ###   ","    #    "] },
+    { n: "전투의 상징", isMulti: true, ans: ["칼", "방패"], fColor:{B:0xdfe8f0, G:0xd4a23a, H:0x5b3418}, sColor:{'#':0x254f8f, E:0xd2b15f, R:0xb3322b},
+      fAscii: ["       B       ","      BBB      ","       B       ","       B       ","       B       ","       B       ","       B       ","       B       ","       B       ","    GGGGGGG    ","       H       ","       H       ","      HHH      "],
+      sAscii: ["   EEEEEEEEE   ","  E#########E  "," E###RRRRR###E ","E####R###R####E","E#####R#R#####E","E######R######E"," E####R#R####E ","  E##R###R##E  ","   E#######E   ","    E#####E    ","     E###E     ","       E       "] },
 
-    { n: "공중과 수중", isMulti: true, ans: ["새", "물고기"], fColor:0x1abc9c, sColor:0xf39c12,
-      fAscii: ["#         #","##   #   ##","### ### ###"," ######### ","    ###    ","     #     "],
-      sAscii: ["    #      ","  #####  # ","######### #"," ######### ","  #####  # ","    #      "] },
+    { n: "공중과 수중", isMulti: true, ans: ["새", "물고기"], fColor:0x35e6c4, sColor:0xffb347,
+      fAscii: ["#             #","##           ##","###         ###","####   #   ####"," ##### # ##### ","  ###########  ","   #########   ","     #####     ","      ###      ","       #       "],
+      sAscii: ["      ##       ","    ######   # ","  ######### ## ","###############"," ##############","  ######### ## ","    ######   # ","      ##       "] },
 
-    { n: "원소의 대립", isMulti: true, ans: ["불", "물"], fColor:0xff3300, sColor:0x3399ff,
-      fAscii: ["   #   #   ","  ### ###  "," ######### ","###########"," ######### ","  #######  "],
-      sAscii: ["    #    ","   ###   ","  #####  "," ####### ","#########"," ####### ","  #####  "] },
+    { n: "원소의 대립", isMulti: true, ans: ["불", "물"], fColor:{R:0xff2d1f, O:0xff8a1f, Y:0xffe04a}, sColor:{'#':0x1b8cff, H:0xbdefff},
+      fAscii: ["       Y       ","      OYO      ","     OOYOO     ","    ROOY OOR   ","   RROOOOORR   ","  RROOYYY OOR  "," RROOOYYYOOORR ","RRROOOYYYOOORRR"," RROOOYYYOOORR ","  RROOOOOOORR  ","   RROOOOORR   ","    RRRRRRR    "],
+      sAscii: ["     HHHHH     ","   H#######H   ","  H###H#####H  "," H#######H###H ","H#####H#######H","H#############H","H#############H","H#############H"," H###########H ","  H#########H  ","   H#######H   ","     HHHHH     "] },
 
-    { n: "왕실의 보물", isMulti: true, ans: ["왕관", "보석"], fColor:0xffd700, sColor:0x9933ff,
-      fAscii: ["#   #   #","## ### ##","#########","#########","#########"],
-      sAscii: ["  #####  "," ####### ","#########"," ####### ","  #####  ","   ###   ","    #    "] },
+    { n: "왕실의 보물", isMulti: true, ans: ["왕관", "보석"], fColor:0xffdf35, sColor:0xb56bff,
+      fAscii: ["#      #      #","##    ###    ##","###  #####  ###","###############"," ############# "," ############# ","###############","###############"],
+      sAscii: ["     #####     ","    #######    ","   #########   ","  ###########  "," ############# ","###############"," ############# ","  ###########  ","   #########   ","    #######    ","      ###      ","       #       "] },
 
-    { n: "정원의 정취", isMulti: true, ans: ["나무", "꽃"], fColor:0x27ae60, sColor:0xff6699,
-      fAscii: ["  #####  "," ####### ","#########"," ####### ","   ###   ","   ###   ","   ###   "],
-      sAscii: ["  # # #  ","  #####  ","# ##### #","  #####  ","  # # #  ","    #    ","   ###   "] },
+    { n: "정원의 정취", isMulti: true, ans: ["나무", "꽃"], fColor:{'#':0x2fc96f, T:0x8b4a1f}, sColor:{P:0xff70b8, O:0xffd34d, L:0x2fc96f, T:0x31b86b},
+      fAscii: ["     #####     ","   #########   ","  ###########  "," ############# ","###############"," ############# ","   #########   ","      TTT      ","      TTT      ","      TTT      ","     TTTTT     ","     TTTTT     "],
+      sAscii: ["      PPP      ","     PPPPP     ","    PPPOPPP    ","   PPPOOOPPP   ","    PPPOPPP    ","     PPPPP     ","      PPP      ","       T       ","      LTL      ","     LLTLL     ","       T       "] },
 
-    { n: "하늘의 기호", isMulti: true, ans: ["하트", "별"], fColor:0xff3366, sColor:0xffcc00,
-      fAscii: [" ###   ### ","##### #####","###########"," ######### ","  #######  ","   #####   ","    ###    ","     #     "],
-      sAscii: ["    #    ","   ###   ","#########"," ####### ","  #####  "," ##   ## ","#       #"] },
+    { n: "하늘의 기호", isMulti: true, ans: ["하트", "별"], fColor:0xff4f88, sColor:0xffd23f,
+      fAscii: ["  ####   ####  "," ###### ###### ","###############","###############"," ############# ","  ###########  ","   #########   ","    #######    ","     #####     ","      ###      ","       #       "],
+      sAscii: ["       #       ","      ###      ","      ###      ","     #####     ","###############","  ###########  ","    #######    ","   #########   ","  ####   ####  "," ####     #### ","##           ##"] },
 
-    { n: "비밀의 문", isMulti: true, ans: ["열쇠", "자물쇠"], fColor:0xf1c40f, sColor:0x7f8c8d,
-      fAscii: ["  #####  "," ##   ## ","  #####  ","    #    ","    ###  ","    #    ","    ##   "],
-      sAscii: ["  #####  "," ##   ## "," ##   ## ","#########","#### ####","#########"] },
+    { n: "비밀의 문", isMulti: true, ans: ["열쇠", "자물쇠"], fColor:0xf6d74a, sColor:0x98a1ad,
+      fAscii: ["    #######    ","   #########   ","   ###   ###   ","   ###   ###   ","   #########   ","    #######    ","       ###     ","       ###     ","       ####### ","       ###  ## ","       #####   ","       ###     "],
+      sAscii: ["     #####     ","   #########   ","  ####   ####  ","  ###     ###  ","  ###     ###  ","###############","###############","###############","######   ######","######   ######","###############","###############"] },
 
-    { n: "반려의 미학", isMulti: true, ans: ["고양이", "강아지"], fColor:0xe67e22, sColor:0x34495e,
-      fAscii: ["#       #","##     ##","#########","## # # ##","#########"," ####### ","  #####  "],
-      sAscii: ["####     ","######   ","#########","  #######","  #####  ","  #   #  "] },
+    { n: "반려의 미학", isMulti: true, ans: ["고양이", "강아지"], fColor:{'#':0xf08a2b, W:0xf7edd7, E:0x1a120b, N:0x1a120b}, sColor:{'#':0x66788d, E:0x111820, N:0x111820},
+      fAscii: ["##           ##","###         ###","####       ####","###############","#####E###E#####","###############","WWWW###N###WWWW","###############","WWWW#####WWWWW ","  ###########  ","   #########   ","    ##   ##    "],
+      sAscii: ["   ###         ","  #####        "," #######   ##  ","####E###E##### ","#######N#######","  ###########  ","   #########   ","    #######    ","    ### ###    ","    ### ###    "] },
 
-    { n: "선율의 향연", isMulti: true, ans: ["피아노", "기타"], fColor:0xecf0f1, sColor:0x3498db,
-      fAscii: ["#########","#########","# # # # #","# # # # #","#########"],
-      sAscii: ["    #    ","    #    ","   ###   ","  #####  "," ####### ","  #####  "," ####### ","  #####  "] },
+    { n: "건반의 선율", isMulti: true, ans: ["건반", "기타"], fColor:{W:0xf5f7fb, B:0x050608, '#':0x050608}, sColor:{'#':0x9b5b2e, S:0xe0c07a, H:0x5b3418},
+      fAscii: ["###############","#WWWWWWWWWWWWW#","#WBWBWWBWBWWBW#","#WBWBWWBWBWWBW#","#WWWWWWWWWWWWW#","#WBWBWWBWBWWBW#","#WBWBWWBWBWWBW#","###############"],
+      sAscii: ["      HHH      ","       S       ","       S       ","       S       ","       S       ","       S       ","       S       ","      ###      ","     #####     ","    #######    ","     #####     ","      ###      ","     ## ##     "] },
 
-    { n: "빛과 어둠", isMulti: true, ans: ["빛", "그림자"], fColor:0xffea00, sColor:0x8e44ad,
-      fAscii: ["  # # #  ","  #####  ","# ##### #","  #####  ","   ###   ","   ###   "],
-      sAscii: ["   ###   ","   ###   "," ####### "," ####### ","   ###   ","  ## ##  ","  ## ##  "] }
+    { n: "체스의 대결", isMulti: true, ans: [["킹", "왕"], ["비숍", "주교"]], fColor:{'#':0xf4f1e8, C:0xd9c98f}, sColor:{'#':0x2c3038, C:0xb7bdc9},
+      fAscii: ["       C       ","      CCC      ","     CCCCC     ","       C       ","    #######    ","   #########   ","    #######    ","   #########   ","  ###########  "," ###########   ","    #####      ","  ###########  "," ############# ","###############"],
+      sAscii: ["    #######    ","   #########   ","  #######      "," #######       "," ######   ###  "," ######  ##### "," ############# ","  ###########  ","    #######    ","    #######    ","   #########   ","  ###########  ","###############"] }
+];
+
+const multiViewSets = [
+    { front: [0, 1.7, 5], side: [5, 1.7, -3], center: [0, 2.5, -3] },
+    { front: [-2.6, 1.7, 5.6], side: [5.6, 1.7, -1.0], center: [-0.2, 2.45, -3.2] },
+    { front: [2.8, 1.7, 5.3], side: [5.2, 1.7, -5.2], center: [0.2, 2.55, -3.0] },
+    { front: [-4.0, 1.7, 4.4], side: [4.7, 1.7, 1.3], center: [-0.4, 2.45, -2.8] },
+    { front: [3.7, 1.7, 4.5], side: [5.8, 1.7, -4.6], center: [0.3, 2.55, -3.3] },
+    { front: [-1.4, 1.7, 6.2], side: [6.2, 1.7, -2.0], center: [0.0, 2.5, -3.1] },
+    { front: [1.7, 1.7, 6.0], side: [4.3, 1.7, -6.0], center: [0.1, 2.45, -3.0] },
+    { front: [-3.4, 1.7, 5.1], side: [6.0, 1.7, -3.8], center: [-0.2, 2.55, -3.3] },
+    { front: [3.2, 1.7, 5.0], side: [4.5, 1.7, 0.6], center: [0.2, 2.5, -2.7] },
+    { front: [-0.8, 1.7, 6.4], side: [6.4, 1.7, -5.0], center: [0.0, 2.5, -3.2] },
+    { front: [4.1, 1.7, 4.2], side: [5.4, 1.7, -0.4], center: [0.4, 2.45, -2.9] },
+    { front: [-4.2, 1.7, 4.1], side: [4.9, 1.7, -5.6], center: [-0.3, 2.55, -3.1] },
+    { front: [0.6, 1.7, 6.5], side: [6.5, 1.7, -3.1], center: [0.0, 2.5, -3.0] }
 ];
 
 const maps = mapDefs.map((def, idx) => {
-    let basePos = [0, 1.7, 5];
-    let baseLook = [0, 2.5, -3];
+    const multiIdx = mapDefs.slice(0, idx).filter(m => m.isMulti).length;
+    const viewSet = def.isMulti ? multiViewSets[multiIdx % multiViewSets.length] : null;
+    let basePos = viewSet ? viewSet.front : [0, 1.7, 5];
+    let baseLook = viewSet ? viewSet.center : [0, 2.5, -3];
     
     return {
         name: def.n,
@@ -523,11 +544,12 @@ const maps = mapDefs.map((def, idx) => {
         hint: def.hint || "",
         pos: basePos, look: baseLook, color: def.fColor || 0x79e4ff,
         isMultiView: def.isMulti,
+        viewSet,
         answers: def.ans || [],
         frontAscii: def.fAscii, sideAscii: def.sAscii, frontColor: def.fColor, sideColor: def.sColor,
         make() {
             if (this.isMultiView) {
-                makeMultiViewMesh(this.frontAscii, this.sideAscii, this.frontColor, this.sideColor);
+                makeMultiViewMesh(this.frontAscii, this.sideAscii, this.frontColor, this.sideColor, this.viewSet);
             } else {
                 let c = mat(this.color); let cam = v(this.pos); let targetCenter = v(this.look); let boxes = def.make();
                 boxes.forEach((p, bIdx) => { 
@@ -583,11 +605,14 @@ function checkAnswer() {
 
     if (!currentStage || !currentStage.isMultiView || !currentStage.answers) return;
 
-    const ans1 = currentStage.answers[0].toLowerCase().replace(/\s+/g, '');
-    const ans2 = currentStage.answers[1].toLowerCase().replace(/\s+/g, '');
+    const normalizeAnswer = answer => answer.toLowerCase().replace(/\s+/g, '');
+    const answerList = answer => (Array.isArray(answer) ? answer : [answer]).map(normalizeAnswer);
+    const ans1List = answerList(currentStage.answers[0]);
+    const ans2List = answerList(currentStage.answers[1]);
 
-    const isDirect = (val1.includes(ans1) && val2.includes(ans2));
-    const isReverse = (val1.includes(ans2) && val2.includes(ans1));
+    const matches = (value, answers) => answers.some(answer => value.includes(answer));
+    const isDirect = (matches(val1, ans1List) && matches(val2, ans2List));
+    const isReverse = (matches(val1, ans2List) && matches(val2, ans1List));
 
     input1.blur(); 
     input2.blur();
@@ -648,8 +673,10 @@ function load(idx){
         $('#answer-input1').value = '';
         $('#answer-input2').value = '';
         $('#answer-box').classList.remove('hidden');
+        $('#progress-ui').classList.add('hidden');
     } else {
         $('#answer-box').classList.add('hidden');
+        $('#progress-ui').classList.remove('hidden');
     }
 
     showLevelPopup(m);
@@ -714,7 +741,8 @@ addEventListener('keydown', e => {
             if (!isTutorialMode && m.isMultiView && m.answers) {
                 const cornerAns = $('#corner-answer');
                 if (cornerAns) {
-                    cornerAns.textContent = `정답: ${m.answers[0]}, ${m.answers[1]}`;
+                    const displayAnswer = answer => Array.isArray(answer) ? answer[0] : answer;
+                    cornerAns.textContent = `정답: ${displayAnswer(m.answers[0])}, ${displayAnswer(m.answers[1])}`;
                     cornerAns.style.display = 'block';
                 }
                 $('#objective-corner').classList.add('show');
@@ -725,8 +753,8 @@ addEventListener('keydown', e => {
 
             if (hintRings.length === 0) {
                 if (m.isMultiView) {
-                    hintRings.push(targetRing([0, 0.025, 5], 0x79e4ff));
-                    hintRings.push(targetRing([5, 0.025, -3], 0xffd166));
+                    hintRings.push(targetRing(m.viewSet.front, 0x79e4ff));
+                    hintRings.push(targetRing(m.viewSet.side, 0xffd166));
                 } else {
                     hintRings.push(targetRing([targetCamPos.x, 0.025, targetCamPos.z], 0x79e4ff));
                 }
@@ -761,7 +789,6 @@ function showHint(msg){ let h = $('#hint'); h.textContent = msg; h.classList.add
 let lastTime = performance.now(), started = false;
 let isAnimatingClear = false; let clearAnimTime = 0; let isTransitioning = false;
 let startCamPos = new THREE.Vector3(); let startCamQuat = new THREE.Quaternion(); let targetCamQuat = new THREE.Quaternion();
-let clearOrigColor = 0;
 
 function onPuzzleCleared() {
     isAnimatingClear = true; clearAnimTime = 0; isTransitioning = false;
@@ -773,12 +800,11 @@ function onPuzzleCleared() {
     dummyCam.rotation.set(Math.asin(exactDir.y), Math.atan2(-exactDir.x, -exactDir.z), 0, 'YXZ');
     targetCamQuat.copy(dummyCam.quaternion);
     
-    let activeMaps = isTutorialMode ? tutorialMaps : maps;
-    clearOrigColor = activeMaps[currentIdx].color;
-
     world.children.forEach(child => { 
         if(child.isMesh && child.geometry.type === 'BoxGeometry') { 
             child.userData.origMat = child.material.clone();
+            child.userData.whiteMat = child.material.clone();
+            child.userData.whiteMat.color.setHex(0xffffff);
         } 
     });
 }
@@ -830,13 +856,11 @@ function animate(now) {
         let euler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
         pitch = euler.x; yaw = euler.y;
 
-        let isWhite = Math.floor(clearAnimTime / 0.25) % 2 === 0;
-        let currentColor = isWhite ? 0xffffff : clearOrigColor;
+        let isWhite = Math.floor(clearAnimTime / 0.25) % 2 === 1;
 
         world.children.forEach(child => { 
             if(child.isMesh && child.userData.origMat) { 
-                child.material = child.userData.origMat;
-                child.material.color.setHex(currentColor);
+                child.material = isWhite ? child.userData.whiteMat : child.userData.origMat;
             }
         });
 
