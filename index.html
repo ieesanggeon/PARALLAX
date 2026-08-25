@@ -268,7 +268,49 @@ function playSfxClear() {
 }
 
 let autoHintEnabled = true;
-$('#auto-hint').addEventListener('change', (e) => { autoHintEnabled = e.target.checked; });
+let autoHintTimer = null; // 자동 힌트 타이머 변수 추가
+
+// 힌트 출력 로직을 공통 함수로 분리
+function triggerHint() {
+    let activeMaps = isTutorialMode ? tutorialMaps : maps;
+    let m = activeMaps[currentIdx];
+    if (!m) return;
+
+    if (!isTutorialMode && m.isMultiView && m.answers) {
+        const cornerAns = $('#corner-answer');
+        if (cornerAns) {
+            cornerAns.textContent = `정답: ${m.answers[0]}, ${m.answers[1]}`;
+            cornerAns.style.display = 'block';
+        }
+        $('#objective-corner').classList.add('show');
+        showHint(`💡 오른쪽 상단에 정답이 표시되었습니다.`);
+    } else {
+        showHint(`💡 힌트: ${m.hint}`);
+    }
+
+    if (hintRings.length === 0) {
+        if (m.isMultiView) {
+            hintRings.push(targetRing([0, 0.025, 5], 0x79e4ff));
+            hintRings.push(targetRing([5, 0.025, -3], 0xffd166));
+        } else {
+            hintRings.push(targetRing([targetCamPos.x, 0.025, targetCamPos.z], 0x79e4ff));
+        }
+    }
+}
+
+// 설정 체크박스 연동 (타이머 적용)
+$('#auto-hint').addEventListener('change', (e) => { 
+    autoHintEnabled = e.target.checked; 
+    if (autoHintEnabled) {
+        if (started && !isPaused && !isAnimatingClear) {
+            clearTimeout(autoHintTimer);
+            autoHintTimer = setTimeout(triggerHint, 120000); // 2분 후 실행
+        }
+    } else {
+        clearTimeout(autoHintTimer); // 체크 해제시 즉시 정지
+    }
+});
+
 $('#bgm-volume').addEventListener('input', (e) => bgmGame.volume = e.target.value / 100);
 
 $('#init-screen').addEventListener('click', () => {
@@ -314,6 +356,7 @@ function resumeGame(viaKeyboard) {
 }
 
 function quitToTitle() {
+    if (autoHintTimer) clearTimeout(autoHintTimer); // 타이머 취소
     isPaused = false; started = false; inMenu = true; menuYaw = 0; clearPendingLockOnClick(); isAnimatingClear = false;
     document.body.classList.remove('in-game');
     if (document.exitPointerLock) document.exitPointerLock();
@@ -651,6 +694,12 @@ function load(idx){
     }
 
     showLevelPopup(m);
+
+    // 새 스테이지 로드 시 자동 힌트 타이머 시작
+    if (autoHintTimer) clearTimeout(autoHintTimer);
+    if (autoHintEnabled) {
+        autoHintTimer = setTimeout(triggerHint, 120000); // 2분
+    }
 }
 
 function getAlignmentScore() {
@@ -707,28 +756,9 @@ addEventListener('keydown', e => {
             return;
         }
 
+        // 수동 힌트 키(Z)를 눌렀을 때 공통 함수 호출
         if (e.code === 'KeyZ' && started && !isPaused) {
-            let m = activeMaps[currentIdx];
-            if (!isTutorialMode && m.isMultiView && m.answers) {
-                const cornerAns = $('#corner-answer');
-                if (cornerAns) {
-                    cornerAns.textContent = `정답: ${m.answers[0]}, ${m.answers[1]}`;
-                    cornerAns.style.display = 'block';
-                }
-                $('#objective-corner').classList.add('show');
-                showHint(`💡 오른쪽 상단에 정답이 표시되었습니다.`);
-            } else {
-                showHint(`💡 힌트: ${m.hint}`);
-            }
-
-            if (hintRings.length === 0) {
-                if (m.isMultiView) {
-                    hintRings.push(targetRing([0, 0.025, 5], 0x79e4ff));
-                    hintRings.push(targetRing([5, 0.025, -3], 0xffd166));
-                } else {
-                    hintRings.push(targetRing([targetCamPos.x, 0.025, targetCamPos.z], 0x79e4ff));
-                }
-            }
+            triggerHint();
             return;
         }
     }
@@ -762,6 +792,7 @@ let startCamPos = new THREE.Vector3(); let startCamQuat = new THREE.Quaternion()
 let clearOrigColor = 0;
 
 function onPuzzleCleared() {
+    if (autoHintTimer) clearTimeout(autoHintTimer); // 퍼즐 클리어 시 타이머 취소
     isAnimatingClear = true; clearAnimTime = 0; isTransitioning = false;
     playSfxClear();
 
